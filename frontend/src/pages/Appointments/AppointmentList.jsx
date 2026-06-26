@@ -1,0 +1,7 @@
+import React from 'react';
+
+const AppointmentList = () => {
+  return <div><h1>Appointments</h1></div>;
+};
+
+export default AppointmentList;

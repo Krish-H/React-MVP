@@ -1,0 +1,80 @@
+export const warmTheme = {
+  colors: {
+    primary: {
+      main: '#0052CC',
+      hover: '#003D99',
+      light: '#E6F0FF',
+      gradient: 'linear-gradient(135deg, #0052CC 0%, #0088FF 100%)',
+    },
+    neutral: {
+      background: '#F4F7FB',
+      surface: '#FFFFFF',
+      divider: '#E5E9F2',
+      border: '#D3D8E0',
+      textPrimary: '#0A192F',
+      textSecondary: '#64748B',
+      disabled: '#CBD5E1',
+    },
+    semantic: {
+      success: { main: '#10B981', background: '#D1FAE5' },
+      error: { main: '#EF4444', background: '#FEE2E2' },
+      warning: { main: '#F59E0B', background: '#FEF3C7' },
+      info: { main: '#3B82F6', background: '#DBEAFE' },
+    },
+  },
+  glass: {
+    background: 'rgba(255, 255, 255, 0.7)',
+    border: '1px solid rgba(255, 255, 255, 0.5)',
+    backdropFilter: 'blur(16px)',
+  },
+  spacing: {
+    xs: '4px',
+    sm: '8px',
+    md: '16px',
+    lg: '24px',
+    xl: '32px',
+    xxl: '48px',
+    xxxl: '64px',
+  },
+  shadows: {
+    sm: '0 1px 2px rgba(10, 25, 47, 0.05)',
+    md: '0 4px 6px -1px rgba(10, 25, 47, 0.05), 0 2px 4px -1px rgba(10, 25, 47, 0.03)',
+    lg: '0 10px 15px -3px rgba(10, 25, 47, 0.05), 0 4px 6px -2px rgba(10, 25, 47, 0.03)',
+    glass: '0 8px 32px 0 rgba(0, 82, 204, 0.1)',
+    inputFocus: '0 0 0 3px rgba(0, 82, 204, 0.15)',
+  },
+  radius: {
+    small: '4px',
+    medium: '8px',
+    card: '16px',
+    button: '8px',
+    round: '50%',
+  },
+  typography: {
+    family: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+    sizes: {
+      h1: '32px',
+      h2: '24px',
+      h3: '20px',
+      body: '16px',
+      caption: '14px',
+      label: '12px',
+    },
+    weights: {
+      regular: 400,
+      medium: 500,
+      semibold: 600,
+      bold: 700,
+    },
+  },
+  transitions: {
+    fast: 'all 0.15s ease-in-out',
+    normal: 'all 0.3s ease-in-out',
+  },
+  breakpoints: {
+    mobile: '390px',
+    tablet: '768px',
+    desktop: '1024px',
+    wide: '1440px',
+  },
+};
