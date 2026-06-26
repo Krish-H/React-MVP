@@ -6,7 +6,8 @@ const initialState = {
   isAuthenticated: false,
   loading: false,
   error: null,
-  initialized: false
+  initialized: false,
+  registrationSuccess: false
 };
 
 const authSlice = createSlice({
@@ -48,6 +49,27 @@ const authSlice = createSlice({
       state.loading = false;
       state.isAuthenticated = false;
       state.error = action.payload;
+    },
+
+    // Register flow
+    registerRequest: (state) => {
+      state.loading = true;
+      state.error = null;
+      state.registrationSuccess = false;
+    },
+    registerSuccess: (state) => {
+      state.loading = false;
+      state.registrationSuccess = true;
+      state.error = null;
+    },
+    registerFailure: (state, action) => {
+      state.loading = false;
+      state.error = action.payload;
+      state.registrationSuccess = false;
+    },
+    resetRegisterState: (state) => {
+      state.registrationSuccess = false;
+      state.error = null;
     },
 
     // Logout flow
@@ -109,7 +131,11 @@ export const {
   getProfileSuccess,
   changePasswordRequest,
   changePasswordSuccess,
-  changePasswordFailure
+  changePasswordFailure,
+  registerRequest,
+  registerSuccess,
+  registerFailure,
+  resetRegisterState
 } = authSlice.actions;
 
 export default authSlice.reducer;

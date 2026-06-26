@@ -40,7 +40,7 @@ Core:
 - React Router
 - Axios
 - styled-components
-- React Hook Form
+
 
 
 UI:

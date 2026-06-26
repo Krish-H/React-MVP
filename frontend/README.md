@@ -54,3 +54,9 @@ Your app is ready to be deployed!
 
 - **Security**: The app utilizes strict Role-Based Access Control (RBAC), CSRF protection, token rotation/refresh, and idle-logout mechanisms.
 - **Multi-Tenancy**: The platform dynamically detects the active tenant from the domain, subsequently fetching and applying tenant-specific configurations, themes, and logos.
+
+
+
+## Start backend
+
+PS C:\wamp64\www\PHP-MVP\backend> & "C:\wamp64\bin\php\php8.5.0\php.exe" -S localhost:8000 -t public

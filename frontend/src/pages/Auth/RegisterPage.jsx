@@ -1,16 +1,19 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Form, Input, Button, Checkbox, Alert, Typography, Divider } from 'antd';
-import { UserOutlined, LockOutlined } from '@ant-design/icons';
+import { Form, Input, Checkbox, Alert, Typography, Divider, Select, message } from 'antd';
+import { UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { selectAuthError } from '../../modules/auth/selectors';
 import loginBg from '../../assets/images/login_bg.png';
+import Button from '../../components/common/Button';
 
 const { Title, Text, Link } = Typography;
+const { Option } = Select;
 
 // --- STYLED COMPONENTS (Theme Integration) ---
+// Using same layout styles as LoginPage
 
 const PageContainer = styled.div`
   display: flex;
@@ -81,7 +84,7 @@ const BrandDescription = styled.p`
   margin: 0 auto;
 `;
 
-// Right Side - Login Section
+// Right Side - Register Section
 const FormSection = styled.div`
   display: flex;
   flex: 1;
@@ -93,13 +96,11 @@ const FormSection = styled.div`
 
 const StyledCard = styled.div`
   width: 100%;
-  max-width: 420px; /* Enterprise Spec Desktop Width */
+  max-width: 460px; /* slightly wider for register */
   background: ${({ theme }) => theme.colors.neutral.surface};
   padding: ${({ theme }) => theme.spacing.xl};
   border-radius: ${({ theme }) => theme.radius.card};
   box-shadow: ${({ theme }) => theme.shadows.md};
-  
-  /* Mobile Spec: 100% width handled by max-width above */
 `;
 
 const CardHeader = styled.div`
@@ -121,58 +122,26 @@ const StyledText = styled(Text)`
 
 // Ant Design Overrides to match theme
 const StyledForm = styled(Form)`
-  .ant-input-affix-wrapper, .ant-input {
-    padding: 12px 16px;
-    border-radius: ${({ theme }) => theme.radius.medium};
-    border-color: ${({ theme }) => theme.colors.neutral.border};
+  .ant-input-affix-wrapper, .ant-input, .ant-select-selector {
+    padding: 12px 16px !important;
+    border-radius: ${({ theme }) => theme.radius.medium} !important;
+    border-color: ${({ theme }) => theme.colors.neutral.border} !important;
+    height: auto !important;
     
     &:hover, &:focus, &-focused {
-      border-color: ${({ theme }) => theme.colors.primary.main};
-      box-shadow: none;
+      border-color: ${({ theme }) => theme.colors.primary.main} !important;
+      box-shadow: none !important;
     }
+  }
+
+  .ant-select-selection-item {
+    line-height: normal !important;
   }
 
   .ant-form-item-label > label {
     color: ${({ theme }) => theme.colors.neutral.textPrimary};
     font-weight: ${({ theme }) => theme.typography.weights.medium};
   }
-  
-  .ant-checkbox-checked .ant-checkbox-inner {
-    background-color: ${({ theme }) => theme.colors.primary.main};
-    border-color: ${({ theme }) => theme.colors.primary.main};
-  }
-`;
-
-const SubmitButton = styled(Button)`
-  && {
-    width: 100%;
-    height: 48px;
-    background: ${({ theme }) => theme.colors.primary.gradient};
-    border: none;
-    border-radius: ${({ theme }) => theme.radius.button};
-    font-size: ${({ theme }) => theme.typography.sizes.body};
-    font-weight: ${({ theme }) => theme.typography.weights.semibold};
-    margin-top: ${({ theme }) => theme.spacing.md};
-
-    &:hover, &:focus {
-      opacity: 0.9;
-      transform: translateY(-1px);
-      box-shadow: ${({ theme }) => theme.shadows.sm};
-      color: white;
-    }
-    
-    &[disabled] {
-      background: ${({ theme }) => theme.colors.neutral.disabled};
-      color: ${({ theme }) => theme.colors.neutral.surface};
-    }
-  }
-`;
-
-const FormFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
 const StyledAlert = styled(Alert)`
@@ -188,22 +157,40 @@ const StyledAlert = styled(Alert)`
   }
 `;
 
-
 // --- COMPONENT LOGIC ---
 
-const LoginPage = () => {
-  const { login, loading, isAuthenticated } = useAuth();
+const RegisterPage = () => {
+  const { register, loading, isAuthenticated, registrationSuccess, resetRegistration } = useAuth();
   const error = useSelector(selectAuthError);
   const navigate = useNavigate();
   
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    // Cleanup registration state on unmount
+    return () => {
+      resetRegistration();
+    };
+  }, []);
+
+  useEffect(() => {
+    if (registrationSuccess) {
+      message.success('Registration successful. Please log in.');
+      navigate('/login');
+    }
+  }, [registrationSuccess, navigate]);
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
   const onFinish = (values) => {
-    login({ email: values.email, password: values.password });
+    register({
+      name: values.name,
+      email: values.email,
+      password: values.password,
+      role: values.role
+    });
   };
 
   return (
@@ -211,11 +198,11 @@ const LoginPage = () => {
       <BrandingSection>
         <BrandContent>
           <BrandLogo>
-            <UserOutlined /> {/* Placeholder Logo */}
+            <UserOutlined />
           </BrandLogo>
           <BrandTagline>Smart Healthcare Management Platform</BrandTagline>
           <BrandDescription>
-            Manage patients, appointments, billing and clinical workflows securely.
+            Join our platform to securely manage patients, appointments, billing and clinical workflows.
           </BrandDescription>
         </BrandContent>
       </BrandingSection>
@@ -223,19 +210,32 @@ const LoginPage = () => {
       <FormSection>
         <StyledCard>
           <CardHeader>
-            <StyledTitle level={2}>Welcome Back</StyledTitle>
-            <StyledText>Login to continue to your healthcare dashboard</StyledText>
+            <StyledTitle level={2}>Create an Account</StyledTitle>
+            <StyledText>Enter your details to register as healthcare staff</StyledText>
           </CardHeader>
 
           {error && <StyledAlert message={error} type="error" showIcon />}
 
           <StyledForm
             form={form}
-            name="login_form"
+            name="register_form"
             layout="vertical"
             onFinish={onFinish}
             requiredMark={false}
           >
+            <Form.Item
+              name="name"
+              label="Full Name"
+              rules={[{ required: true, message: 'Please input your full name!' }]}
+            >
+              <Input 
+                prefix={<IdcardOutlined style={{ color: '#64748B' }} />} 
+                placeholder="Dr. Jane Doe" 
+                size="large"
+                disabled={loading}
+              />
+            </Form.Item>
+
             <Form.Item
               name="email"
               label="Email Address"
@@ -245,11 +245,26 @@ const LoginPage = () => {
               ]}
             >
               <Input 
-                prefix={<UserOutlined style={{ color: '#64748B' }} />} 
+                prefix={<MailOutlined style={{ color: '#64748B' }} />} 
                 placeholder="doctor@hospital.com" 
                 size="large"
                 disabled={loading}
               />
+            </Form.Item>
+
+            <Form.Item
+              name="role"
+              label="Role"
+              rules={[{ required: true, message: 'Please select your role!' }]}
+            >
+              <Select placeholder="Select a role" disabled={loading} size="large">
+                <Option value="admin">Admin</Option>
+                <Option value="doctor">Doctor</Option>
+                <Option value="nurse">Nurse</Option>
+                <Option value="receptionist">Receptionist</Option>
+                <Option value="pharmacist">Pharmacist</Option>
+                <Option value="patient">Patient</Option>
+              </Select>
             </Form.Item>
 
             <Form.Item
@@ -268,32 +283,46 @@ const LoginPage = () => {
               />
             </Form.Item>
 
-            <FormFooter>
-              <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox disabled={loading}>Remember me</Checkbox>
-              </Form.Item>
-              <Link href="#" style={{ color: '#0052CC' }}>
-                Forgot password?
-              </Link>
-            </FormFooter>
-
-            <Form.Item>
-              <SubmitButton type="primary" htmlType="submit" loading={loading}>
-                Sign In
-              </SubmitButton>
+            <Form.Item
+              name="confirmPassword"
+              label="Confirm Password"
+              dependencies={['password']}
+              rules={[
+                { required: true, message: 'Please confirm your password!' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('password') === value) {
+                      return Promise.resolve();
+                    }
+                    return Promise.reject(new Error('The two passwords that you entered do not match!'));
+                  },
+                }),
+              ]}
+            >
+              <Input.Password 
+                prefix={<LockOutlined style={{ color: '#64748B' }} />} 
+                placeholder="••••••••" 
+                size="large"
+                disabled={loading}
+              />
             </Form.Item>
 
-            <div style={{ textAlign: 'center', marginTop: '16px' }}>
-              <Text type="secondary">Don't have an account? </Text>
-              <Link onClick={() => navigate('/register')} style={{ color: '#0052CC', fontWeight: 600 }}>
-                Register here
+            <Form.Item>
+              <Button type="primary" htmlType="submit" loading={loading} block style={{ marginTop: '16px' }}>
+                Create Account
+              </Button>
+            </Form.Item>
+            
+            <div style={{ textAlign: 'center' }}>
+              <Text type="secondary">Already have an account? </Text>
+              <Link onClick={() => navigate('/login')} style={{ color: '#0052CC', fontWeight: 600 }}>
+                Sign In
               </Link>
             </div>
-            
           </StyledForm>
           
           <Divider plain>
-            <Text type="secondary" style={{ fontSize: '12px' }}>Enterprise Secure Login</Text>
+            <Text type="secondary" style={{ fontSize: '12px' }}>Enterprise Secure Platform</Text>
           </Divider>
         </StyledCard>
       </FormSection>
@@ -301,4 +330,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
+export default RegisterPage;

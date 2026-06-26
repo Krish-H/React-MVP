@@ -16,7 +16,10 @@ import {
   changePasswordFailure,
   initializeAuthRequest,
   initializeAuthSuccess,
-  initializeAuthFailure
+  initializeAuthFailure,
+  registerRequest,
+  registerSuccess,
+  registerFailure
 } from './authSlice';
 
 // Worker Sagas
@@ -37,6 +40,15 @@ function* handleLogin(action) {
     yield put(loginSuccess({ user, accessToken: access_token }));
   } catch (error) {
     yield put(loginFailure(error.message));
+  }
+}
+
+function* handleRegister(action) {
+  try {
+    yield call(authAPI.registerUser, action.payload);
+    yield put(registerSuccess());
+  } catch (error) {
+    yield put(registerFailure(error.message));
   }
 }
 
@@ -107,6 +119,7 @@ export default function* authSaga() {
     takeLatest(refreshTokenRequest.type, handleRefreshToken),
     takeLatest(getProfileRequest.type, handleGetProfile),
     takeLatest(changePasswordRequest.type, handleChangePassword),
-    takeLatest(initializeAuthRequest.type, handleInitializeAuth)
+    takeLatest(initializeAuthRequest.type, handleInitializeAuth),
+    takeLatest(registerRequest.type, handleRegister)
   ]);
 }

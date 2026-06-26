@@ -5,3 +5,4 @@ export const selectAuthError = (state) => state.auth.error;
 export const selectAuthInitialized = (state) => state.auth.initialized;
 export const selectUserRole = (state) => state.auth.user?.role_id;
 export const selectUserTenantId = (state) => state.auth.user?.tenant_id;
+export const selectRegistrationSuccess = (state) => state.auth.registrationSuccess;

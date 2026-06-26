@@ -1,11 +1,12 @@
 import React, { Suspense, lazy } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import Loader from '../components/common/Loader';
 
 // Lazy loading the pages
 const LoginPage = lazy(() => import('../pages/Auth/LoginPage'));
+const RegisterPage = lazy(() => import('../pages/Auth/RegisterPage'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 const DashboardPage = lazy(() => import('../pages/Dashboard/DashboardPage'));
 const PatientList = lazy(() => import('../pages/Patients/PatientList'));
@@ -27,16 +28,14 @@ const AppRouter = () => {
       <Routes>
         {/* Public Routes */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Protected Routes inside Main Layout */}
         <Route 
           element={
             <ProtectedRoute>
-              <LayoutFallback>
-                {/* Note: React Router Outlet will eventually go in the real DashboardLayout. 
-                    For now, we'll just render child routes directly. */}
-              </LayoutFallback>
+              <Outlet />
             </ProtectedRoute>
           }
         >

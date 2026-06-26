@@ -6,6 +6,10 @@ export const authAPI = {
     return apiService.post(apiEndpoints.auth.login, credentials);
   },
   
+  registerUser: (userData) => {
+    return apiService.post(apiEndpoints.auth.register, userData);
+  },
+  
   logoutUser: () => {
     return apiService.post(apiEndpoints.auth.logout);
   },
