@@ -1,10 +1,34 @@
-# Getting Started with Create React App
+# Healthcare Management System - Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the frontend application for the Healthcare Management System, a scalable, secure, and multi-tenant SaaS dashboard designed for various healthcare professionals including Admins, Doctors, Nurses, Receptionists, Pharmacists, and Patients.
 
-## Available Scripts
+## Tech Stack
+
+- **Core**: React.js, React Router
+- **State Management**: Redux Toolkit, Redux Saga
+- **API & Networking**: Axios
+- **Styling**: styled-components
+- **UI Components**: Ant Design
+
+## Architecture
+
+The project follows a highly modular architecture where each business feature is isolated into its own module containing:
+- Components & Pages
+- Redux Slices & Sagas
+- API Service Methods
+- Custom Hooks
+
+All asynchronous state and side effects are managed exclusively via **Redux Saga**. API communication is centralized through a customized Axios client (`axiosClient.js`) which handles token injection, automated refresh token workflows, and tenant headers. 
+
+For comprehensive details on the project's architecture, folder structure, UI component guidelines, and security practices, please read the [ARCHITECTURE.md](./ARCHITECTURE.md) file.
+
+## Getting Started
 
 In the project directory, you can run:
+
+### `npm install`
+
+Installs all the required dependencies.
 
 ### `npm start`
 
@@ -16,8 +40,7 @@ You may also see any lint errors in the console.
 
 ### `npm test`
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Launches the test runner in the interactive watch mode.
 
 ### `npm run build`
 
@@ -27,44 +50,7 @@ It correctly bundles React in production mode and optimizes the build for the be
 The build is minified and the filenames include the hashes.\
 Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## Security & Multi-Tenancy
 
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+- **Security**: The app utilizes strict Role-Based Access Control (RBAC), CSRF protection, token rotation/refresh, and idle-logout mechanisms.
+- **Multi-Tenancy**: The platform dynamically detects the active tenant from the domain, subsequently fetching and applying tenant-specific configurations, themes, and logos.
