@@ -1,182 +1,166 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
-import { Form, Input, Alert, Typography, Divider, Select, message } from 'antd';
-import { UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
-import { useAuth } from '../../modules/auth/hooks/useAuth';
+import { Form, Input, Typography, Progress } from 'antd';
+import {
+  UserOutlined,
+  LockOutlined,
+  MailOutlined,
+  BankOutlined,
+} from '@ant-design/icons';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { selectAuthError } from '../../modules/auth/selectors';
-import loginBg from '../../assets/images/login_bg.png';
 import Button from '../../components/common/Button';
+import AuthLayout from './components/AuthLayout';
+import AuthHeader from './components/AuthHeader';
+import AuthFooter from './components/AuthFooter';
 
-const { Title, Text, Link } = Typography;
-const { Option } = Select;
+const { Text } = Typography;
 
-// --- STYLED COMPONENTS (Theme Integration) ---
-// Using same layout styles as LoginPage
+// ─── Password Strength ───────────────────────────────────────────────────────
 
-const PageContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-  font-family: ${({ theme }) => theme.typography.family};
-  background-color: ${({ theme }) => theme.colors.neutral.background};
+const getStrength = (password) => {
+  if (!password) return null;
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[a-z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
 
-  /* Mobile Layout: Stack vertically */
-  flex-direction: column;
-  
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: row;
-  }
-`;
+  const levels = [
+    { label: 'Very Weak', percent: 10, color: '#EF4444' },
+    { label: 'Weak',      percent: 25, color: '#F59E0B' },
+    { label: 'Fair',      percent: 50, color: '#F59E0B' },
+    { label: 'Good',      percent: 75, color: '#3B82F6' },
+    { label: 'Strong',    percent: 90, color: '#10B981' },
+    { label: 'Very Strong', percent: 100, color: '#059669' },
+  ];
+  return { score, ...levels[score] };
+};
 
-// Left Side - Branding Section
-const BrandingSection = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-image: url(${loginBg});
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  padding: ${({ theme }) => theme.spacing.xxxl};
-  min-height: 300px;
-  
-  /* Modern Gradient Overlay */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, rgba(0, 82, 204, 0.8) 0%, rgba(10, 25, 47, 0.9) 100%);
-  }
+// ─── Styled ───────────────────────────────────────────────────────────────────
 
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    min-height: 100vh;
-  }
-`;
-
-const BrandContent = styled.div`
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  color: ${({ theme }) => theme.colors.neutral.surface};
-`;
-
-const BrandLogo = styled.div`
-  font-size: 48px;
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  color: ${({ theme }) => theme.colors.neutral.surface};
-`;
-
-const BrandTagline = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes.h1};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  color: ${({ theme }) => theme.colors.neutral.surface};
-`;
-
-const BrandDescription = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.body};
-  opacity: 0.8;
-  max-width: 400px;
-  margin: 0 auto;
-`;
-
-// Right Side - Register Section
-const FormSection = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing.lg};
-  background-color: ${({ theme }) => theme.colors.neutral.background};
-`;
-
-const StyledCard = styled.div`
-  width: 100%;
-  max-width: 460px; /* slightly wider for register */
-  background: ${({ theme }) => theme.colors.neutral.surface};
-  padding: ${({ theme }) => theme.spacing.xl};
-  border-radius: ${({ theme }) => theme.radius.card};
-  box-shadow: ${({ theme }) => theme.shadows.md};
-`;
-
-const CardHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-`;
-
-const StyledTitle = styled(Title)`
-  && {
-    color: ${({ theme }) => theme.colors.neutral.textPrimary};
-    margin-bottom: ${({ theme }) => theme.spacing.xs};
-    font-weight: ${({ theme }) => theme.typography.weights.bold};
-  }
-`;
-
-const StyledText = styled(Text)`
-  color: ${({ theme }) => theme.colors.neutral.textSecondary};
-`;
-
-// Ant Design Overrides to match theme
 const StyledForm = styled(Form)`
-  .ant-input-affix-wrapper, .ant-input, .ant-select-selector {
-    padding: 12px 16px !important;
-    border-radius: ${({ theme }) => theme.radius.medium} !important;
-    border-color: ${({ theme }) => theme.colors.neutral.border} !important;
-    height: auto !important;
-    
-    &:hover, &:focus, &-focused {
-      border-color: ${({ theme }) => theme.colors.primary.main} !important;
-      box-shadow: none !important;
-    }
+  /* Two-column grid row */
+  .field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: ${({ theme }) => theme.spacing.md};
   }
 
-  .ant-select-selection-item {
-    line-height: normal !important;
+  .ant-input-affix-wrapper,
+  .ant-input {
+    padding: 8px 12px;
+    border-radius: ${({ theme }) => theme.radius.small};
+    border-color: ${({ theme }) => theme.colors.neutral.border};
+    transition: ${({ theme }) => theme.transitions.fast};
+
+    &:hover {
+      border-color: ${({ theme }) => theme.colors.primary.main};
+    }
+
+    &-focused,
+    &:focus {
+      border-color: ${({ theme }) => theme.colors.primary.main};
+      box-shadow: ${({ theme }) => theme.shadows.inputFocus};
+    }
   }
 
   .ant-form-item-label > label {
-    color: ${({ theme }) => theme.colors.neutral.textPrimary};
+    color: ${({ theme }) => theme.colors.neutral.textSecondary};
     font-weight: ${({ theme }) => theme.typography.weights.medium};
+    font-size: ${({ theme }) => theme.typography.sizes.label};
+  }
+
+  .ant-form-item-explain-error {
+    font-size: ${({ theme }) => theme.typography.sizes.label};
+    margin-top: 2px;
+  }
+
+  /* Tighten all form items */
+  .ant-form-item {
+    margin-bottom: ${({ theme }) => theme.spacing.sm};
   }
 `;
 
-const StyledAlert = styled(Alert)`
+const ErrorBanner = styled.div`
+  background-color: ${({ theme }) => theme.colors.semantic.error.background};
+  border: 1px solid ${({ theme }) => theme.colors.semantic.error.main};
+  border-radius: ${({ theme }) => theme.radius.medium};
+  color: ${({ theme }) => theme.colors.semantic.error.main};
+  font-size: ${({ theme }) => theme.typography.sizes.label};
+  padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+  margin-bottom: ${({ theme }) => theme.spacing.md};
+`;
+
+const StrengthWrapper = styled.div`
+  margin-top: -4px;
+  margin-bottom: ${({ theme }) => theme.spacing.xs};
+`;
+
+const StrengthLabel = styled(Text)`
+  font-size: ${({ theme }) => theme.typography.sizes.label};
+  color: ${({ theme }) => theme.colors.neutral.textSecondary};
+`;
+
+const SubmitButton = styled(Button)`
   && {
-    margin-bottom: ${({ theme }) => theme.spacing.lg};
-    border-radius: ${({ theme }) => theme.radius.medium};
-    background-color: ${({ theme }) => theme.colors.semantic.error.background};
-    border-color: ${({ theme }) => theme.colors.semantic.error.background};
-    
-    .ant-alert-message {
-      color: ${({ theme }) => theme.colors.semantic.error.main};
+    width: 100%;
+    height: 44px;
+    font-size: ${({ theme }) => theme.typography.sizes.caption};
+    font-weight: ${({ theme }) => theme.typography.weights.semibold};
+    background: ${({ theme }) => theme.colors.primary.gradient};
+    border: none;
+    margin-top: ${({ theme }) => theme.spacing.xs};
+
+    &:hover:not([disabled]) {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: ${({ theme }) => theme.shadows.sm};
+      color: ${({ theme }) => theme.colors.neutral.surface};
     }
   }
 `;
 
-// --- COMPONENT LOGIC ---
+const SignInRow = styled.div`
+  text-align: center;
+  margin-top: ${({ theme }) => theme.spacing.sm};
+  font-size: ${({ theme }) => theme.typography.sizes.label};
+`;
+
+const LoginLink = styled.span`
+  color: ${({ theme }) => theme.colors.primary.main};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  margin-left: 4px;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary.hover};
+    text-decoration: underline;
+  }
+`;
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const RegisterPage = () => {
   const { register, loading, isAuthenticated, registrationSuccess, resetRegistration } = useAuth();
   const error = useSelector(selectAuthError);
   const navigate = useNavigate();
-  
   const [form] = Form.useForm();
+  const [passwordValue, setPasswordValue] = useState('');
 
   useEffect(() => {
-    // Cleanup registration state on unmount
-    return () => {
-      resetRegistration();
-    };
-  }, [resetRegistration]);
+    return () => resetRegistration();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     if (registrationSuccess) {
-      message.success('Registration successful. Please log in.');
-      navigate('/login');
+      navigate('/login', {
+        state: { message: 'Registration successful. Please sign in.' },
+      });
     }
   }, [registrationSuccess, navigate]);
 
@@ -186,147 +170,168 @@ const RegisterPage = () => {
 
   const onFinish = (values) => {
     register({
+      hospital_name: values.hospitalName,
       name: values.name,
       email: values.email,
       password: values.password,
-      role: values.role
     });
   };
 
+  const strength = getStrength(passwordValue);
+
   return (
-    <PageContainer>
-      <BrandingSection>
-        <BrandContent>
-          <BrandLogo>
-            <UserOutlined />
-          </BrandLogo>
-          <BrandTagline>Smart Healthcare Management Platform</BrandTagline>
-          <BrandDescription>
-            Join our platform to securely manage patients, appointments, billing and clinical workflows.
-          </BrandDescription>
-        </BrandContent>
-      </BrandingSection>
+    <AuthLayout>
+      <AuthHeader
+        title="Create an Account"
+        subtitle="Register your organisation on the healthcare platform"
+      />
 
-      <FormSection>
-        <StyledCard>
-          <CardHeader>
-            <StyledTitle level={2}>Create an Account</StyledTitle>
-            <StyledText>Enter your details to register as healthcare staff</StyledText>
-          </CardHeader>
+      {error && <ErrorBanner>{error}</ErrorBanner>}
 
-          {error && <StyledAlert message={error} type="error" showIcon />}
-
-          <StyledForm
-            form={form}
-            name="register_form"
-            layout="vertical"
-            onFinish={onFinish}
-            requiredMark={false}
+      <StyledForm
+        form={form}
+        name="register_form"
+        layout="vertical"
+        onFinish={onFinish}
+        requiredMark={false}
+        autoComplete="off"
+        scrollToFirstError
+      >
+        {/* Row 1: Hospital name + Full name */}
+        <div className="field-row">
+          <Form.Item
+            name="hospitalName"
+            label="Hospital / Organisation"
+            rules={[
+              { required: true, message: 'Required.' },
+              { min: 2, message: 'Min 2 characters.' },
+            ]}
           >
-            <Form.Item
-              name="name"
-              label="Full Name"
-              rules={[{ required: true, message: 'Please input your full name!' }]}
-            >
-              <Input 
-                prefix={<IdcardOutlined style={{ color: '#64748B' }} />} 
-                placeholder="Dr. Jane Doe" 
-                size="large"
-                disabled={loading}
-              />
-            </Form.Item>
+            <Input
+              prefix={<BankOutlined />}
+              placeholder="City General Hospital"
+              size="middle"
+              disabled={loading}
+            />
+          </Form.Item>
 
-            <Form.Item
-              name="email"
-              label="Email Address"
-              rules={[
-                { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'Please enter a valid email format!' }
-              ]}
-            >
-              <Input 
-                prefix={<MailOutlined style={{ color: '#64748B' }} />} 
-                placeholder="doctor@hospital.com" 
-                size="large"
-                disabled={loading}
-              />
-            </Form.Item>
+          <Form.Item
+            name="name"
+            label="Full Name"
+            rules={[
+              { required: true, message: 'Required.' },
+              { min: 2, message: 'Min 2 characters.' },
+            ]}
+          >
+            <Input
+              prefix={<UserOutlined />}
+              placeholder="Dr. Jane Doe"
+              size="middle"
+              disabled={loading}
+            />
+          </Form.Item>
+        </div>
 
-            <Form.Item
-              name="role"
-              label="Role"
-              rules={[{ required: true, message: 'Please select your role!' }]}
-            >
-              <Select placeholder="Select a role" disabled={loading} size="large">
-                <Option value="admin">Admin</Option>
-                <Option value="doctor">Doctor</Option>
-                <Option value="nurse">Nurse</Option>
-                <Option value="receptionist">Receptionist</Option>
-                <Option value="pharmacist">Pharmacist</Option>
-                <Option value="patient">Patient</Option>
-              </Select>
-            </Form.Item>
+        {/* Row 2: Email — full width */}
+        <Form.Item
+          name="email"
+          label="Email Address"
+          rules={[
+            { required: true, message: 'Required.' },
+            { type: 'email', message: 'Enter a valid email.' },
+          ]}
+        >
+          <Input
+            prefix={<MailOutlined />}
+            placeholder="doctor@hospital.com"
+            size="middle"
+            disabled={loading}
+            autoComplete="email"
+          />
+        </Form.Item>
 
+        {/* Row 3: Password + Confirm password */}
+        <div className="field-row">
+          <div>
             <Form.Item
               name="password"
               label="Password"
               rules={[
-                { required: true, message: 'Please input your password!' },
-                { min: 6, message: 'Password must be at least 6 characters.' }
+                { required: true, message: 'Required.' },
+                { min: 6, message: 'Min 6 characters.' },
               ]}
             >
-              <Input.Password 
-                prefix={<LockOutlined style={{ color: '#64748B' }} />} 
-                placeholder="••••••••" 
-                size="large"
+              <Input.Password
+                prefix={<LockOutlined />}
+                placeholder="••••••••"
+                size="middle"
                 disabled={loading}
+                autoComplete="new-password"
+                onChange={(e) => setPasswordValue(e.target.value)}
               />
             </Form.Item>
 
-            <Form.Item
-              name="confirmPassword"
-              label="Confirm Password"
-              dependencies={['password']}
-              rules={[
-                { required: true, message: 'Please confirm your password!' },
-                ({ getFieldValue }) => ({
-                  validator(_, value) {
-                    if (!value || getFieldValue('password') === value) {
-                      return Promise.resolve();
-                    }
-                    return Promise.reject(new Error('The two passwords that you entered do not match!'));
-                  },
-                }),
-              ]}
-            >
-              <Input.Password 
-                prefix={<LockOutlined style={{ color: '#64748B' }} />} 
-                placeholder="••••••••" 
-                size="large"
-                disabled={loading}
-              />
-            </Form.Item>
+            {/* Strength bar sits under the password field */}
+            {strength && (
+              <StrengthWrapper>
+                <Progress
+                  percent={strength.percent}
+                  showInfo={false}
+                  size="small"
+                  strokeColor={strength.color}
+                  style={{ marginBottom: 2 }}
+                />
+                <StrengthLabel>{strength.label}</StrengthLabel>
+              </StrengthWrapper>
+            )}
+          </div>
 
-            <Form.Item>
-              <Button type="primary" htmlType="submit" loading={loading} block style={{ marginTop: '16px' }}>
-                Create Account
-              </Button>
-            </Form.Item>
-            
-            <div style={{ textAlign: 'center' }}>
-              <Text type="secondary">Already have an account? </Text>
-              <Link onClick={() => navigate('/login')} style={{ color: '#0052CC', fontWeight: 600 }}>
-                Sign In
-              </Link>
-            </div>
-          </StyledForm>
-          
-          <Divider plain>
-            <Text type="secondary" style={{ fontSize: '12px' }}>Enterprise Secure Platform</Text>
-          </Divider>
-        </StyledCard>
-      </FormSection>
-    </PageContainer>
+          <Form.Item
+            name="confirmPassword"
+            label="Confirm Password"
+            dependencies={['password']}
+            rules={[
+              { required: true, message: 'Required.' },
+              ({ getFieldValue }) => ({
+                validator(_, value) {
+                  if (!value || getFieldValue('password') === value) {
+                    return Promise.resolve();
+                  }
+                  return Promise.reject(new Error('Passwords do not match.'));
+                },
+              }),
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="••••••••"
+              size="middle"
+              disabled={loading}
+              autoComplete="new-password"
+            />
+          </Form.Item>
+        </div>
+
+        {/* Submit */}
+        <Form.Item noStyle>
+          <SubmitButton
+            variant="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
+          >
+            Create Account
+          </SubmitButton>
+        </Form.Item>
+      </StyledForm>
+
+      <SignInRow>
+        <Text type="secondary">Already have an account?</Text>
+        <LoginLink onClick={() => navigate('/login')}>Sign in</LoginLink>
+      </SignInRow>
+
+      <AuthFooter label="Enterprise Secure Platform" />
+    </AuthLayout>
   );
 };
 
