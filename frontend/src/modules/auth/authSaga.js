@@ -1,6 +1,7 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { authAPI } from './authAPI';
 import { tokenService } from '../../services/tokenService';
+import { csrfService } from '../../services/csrfService';
 import {
   loginRequest,
   loginSuccess,
@@ -28,10 +29,10 @@ function* handleLogin(action) {
     const response = yield call(authAPI.loginUser, action.payload);
     
     // Store tokens
-    const { access_token, refresh_token, user } = response;
+    const { access_token, csrf_token, user } = response;
     tokenService.setAccessToken(access_token);
-    if (refresh_token) {
-      tokenService.setRefreshToken(refresh_token);
+    if (csrf_token) {
+      csrfService.setCsrfToken(csrf_token);
     }
     
     // Optionally fetch full profile here if not returned by login
@@ -60,17 +61,22 @@ function* handleLogout() {
     console.warn('Logout API failed, forcing local logout');
   } finally {
     tokenService.clearAllTokens();
+    csrfService.clearCsrfToken();
     yield put(logoutSuccess());
     window.location.href = '/login';
   }
 }
 
-function* handleRefreshToken(action) {
+function* handleRefreshToken() {
   try {
-    const response = yield call(authAPI.refreshToken, action.payload);
-    const newAccessToken = response.access_token;
-    tokenService.setAccessToken(newAccessToken);
-    yield put(refreshTokenSuccess(newAccessToken));
+    const response = yield call(authAPI.refreshToken);
+    const newAccessToken = response.access_token || response.accessToken;
+    if (newAccessToken) {
+      tokenService.setAccessToken(newAccessToken);
+      yield put(refreshTokenSuccess(newAccessToken));
+    } else {
+      yield put(logoutRequest());
+    }
   } catch (error) {
     // If refresh fails, log out
     yield put(logoutRequest());
@@ -98,6 +104,16 @@ function* handleChangePassword(action) {
 
 function* handleInitializeAuth() {
   try {
+    // Fetch CSRF token on app startup
+    try {
+      const csrfResponse = yield call(authAPI.getCsrfToken);
+      if (csrfResponse && csrfResponse.csrf_token) {
+        csrfService.setCsrfToken(csrfResponse.csrf_token);
+      }
+    } catch (csrfError) {
+      console.warn('Failed to fetch CSRF token on init', csrfError);
+    }
+    
     const token = tokenService.getAccessToken();
     if (token) {
       const userProfile = yield call(authAPI.getProfile);
@@ -107,6 +123,7 @@ function* handleInitializeAuth() {
     }
   } catch (error) {
     tokenService.clearAllTokens();
+    csrfService.clearCsrfToken();
     yield put(initializeAuthFailure());
   }
 }
