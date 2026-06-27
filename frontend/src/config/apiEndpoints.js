@@ -5,7 +5,8 @@ export const apiEndpoints = {
     logout: '/logout',
     refresh: '/refresh',
     profile: '/profile',
-    changePassword: '/change-password'
+    changePassword: '/change-password',
+    csrfToken: '/csrf-token'
   },
   dashboard: '/dashboard',
   // Other module endpoints...

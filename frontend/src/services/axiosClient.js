@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { environment } from '../config/environment';
 import { tokenService } from './tokenService';
+import { csrfService } from './csrfService';
 
 const axiosClient = axios.create({
   baseURL: environment.API_BASE_URL,
@@ -10,22 +11,28 @@ const axiosClient = axios.create({
   timeout: 10000,
 });
 
+axiosClient.defaults.withCredentials = true;
+
+const publicRoutes = ['/login', '/register', '/csrf-token', '/refresh'];
+
 // Request Interceptor
 axiosClient.interceptors.request.use(
   (config) => {
-    const token = tokenService.getAccessToken();
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
+    const isPublicRoute = publicRoutes.some(route => config.url?.includes(route));
+
+    if (!isPublicRoute) {
+      const token = tokenService.getAccessToken();
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+
+      if (['post', 'put', 'patch', 'delete'].includes(config.method?.toLowerCase())) {
+        const csrfToken = csrfService.getCsrfToken();
+        if (csrfToken) {
+          config.headers['X-CSRF-TOKEN'] = csrfToken;
+        }
+      }
     }
-
-    // Example for CSRF token if needed
-    // const csrfToken = getCookie('XSRF-TOKEN');
-    // if (csrfToken) {
-    //   config.headers['X-XSRF-TOKEN'] = csrfToken;
-    // }
-
-    // Tenant header logic can be added here
-    // config.headers['X-Tenant-ID'] = currentTenantId;
 
     return config;
   },
@@ -37,7 +44,6 @@ axiosClient.interceptors.request.use(
 // Response Interceptor
 axiosClient.interceptors.response.use(
   (response) => {
-    // Any status code that lie within the range of 2xx cause this function to trigger
     return response;
   },
   async (error) => {
@@ -46,33 +52,32 @@ axiosClient.interceptors.response.use(
     // Handle 401 Unauthorized (Token expired/invalid)
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      const refreshToken = tokenService.getRefreshToken();
-      
-      if (refreshToken) {
-        try {
-          // Call refresh token API (do NOT use axiosClient here to avoid infinite loops)
-          const response = await axios.post(`${environment.API_BASE_URL}/auth/refresh`, {
-            refreshToken
-          });
-          
-          const newAccessToken = response.data.accessToken;
-          tokenService.setAccessToken(newAccessToken);
-          
-          // Retry the original request with new token
-          originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
-          return axiosClient(originalRequest);
-        } catch (refreshError) {
-          // Refresh failed, user needs to login again
-          tokenService.clearAllTokens();
-          // Optionally trigger an event to redirect to login
-          window.location.href = '/login';
-          return Promise.reject(refreshError);
-        }
-      } else {
-        // No refresh token available, force logout
+
+      try {
+        // Call refresh token API (do NOT use axiosClient here to avoid infinite loops)
+        // Cookie is automatically sent due to withCredentials
+        const response = await axios.post(`${environment.API_BASE_URL}/refresh`, {}, {
+          withCredentials: true
+        });
+
+        const newAccessToken = response.data.accessToken || response.data.access_token;
+        tokenService.setAccessToken(newAccessToken);
+
+        // Retry the original request with new token
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return axiosClient(originalRequest);
+      } catch (refreshError) {
+        // Refresh failed, user needs to login again
         tokenService.clearAllTokens();
+        csrfService.clearCsrfToken();
         window.location.href = '/login';
+        return Promise.reject(refreshError);
       }
+    } else if (error.response?.status === 401 && originalRequest._retry) {
+      // Prevent infinite refresh loop
+      tokenService.clearAllTokens();
+      csrfService.clearCsrfToken();
+      window.location.href = '/login';
     }
 
     // Format error response

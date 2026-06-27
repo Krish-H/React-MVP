@@ -14,8 +14,8 @@ export const authAPI = {
     return apiService.post(apiEndpoints.auth.logout);
   },
   
-  refreshToken: (token) => {
-    return apiService.post(apiEndpoints.auth.refresh, { refreshToken: token });
+  refreshToken: () => {
+    return apiService.post(apiEndpoints.auth.refresh);
   },
   
   getProfile: () => {
@@ -24,5 +24,9 @@ export const authAPI = {
   
   changePassword: (passwordData) => {
     return apiService.post(apiEndpoints.auth.changePassword, passwordData);
+  },
+
+  getCsrfToken: () => {
+    return apiService.get(apiEndpoints.auth.csrfToken);
   }
 };
