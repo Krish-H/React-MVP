@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import styled from 'styled-components';
-import { Form, Input, Checkbox, Alert, Typography, Divider, Select, message } from 'antd';
+import { Form, Input, Alert, Typography, Divider, Select, message } from 'antd';
 import { UserOutlined, LockOutlined, MailOutlined, IdcardOutlined } from '@ant-design/icons';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { Navigate, useNavigate } from 'react-router-dom';
@@ -171,7 +171,7 @@ const RegisterPage = () => {
     return () => {
       resetRegistration();
     };
-  }, []);
+  }, [resetRegistration]);
 
   useEffect(() => {
     if (registrationSuccess) {

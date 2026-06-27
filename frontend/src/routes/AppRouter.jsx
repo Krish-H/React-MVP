@@ -9,24 +9,18 @@ const LoginPage = lazy(() => import('../pages/Auth/LoginPage'));
 const RegisterPage = lazy(() => import('../pages/Auth/RegisterPage'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 const DashboardPage = lazy(() => import('../pages/Dashboard/DashboardPage'));
+const LandingPage = lazy(() => import('../pages/Landing/LandingPage'));
 const PatientList = lazy(() => import('../pages/Patients/PatientList'));
 const AppointmentList = lazy(() => import('../pages/Appointments/AppointmentList'));
 const InvoicePage = lazy(() => import('../pages/Billing/InvoicePage'));
 const StaffManagement = lazy(() => import('../pages/Staff/StaffManagement'));
-
-// A minimal placeholder for MainLayout until implemented
-const LayoutFallback = ({ children }) => (
-  <div>
-    <header style={{ padding: '10px', background: '#e0e0e0' }}>Main Layout Header</header>
-    <main style={{ padding: '20px' }}>{children}</main>
-  </div>
-);
 
 const AppRouter = () => {
   return (
     <Suspense fallback={<Loader />}>
       <Routes>
         {/* Public Routes */}
+        <Route path="/" element={<LandingPage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<RegisterPage />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
@@ -56,7 +50,7 @@ const AppRouter = () => {
         </Route>
 
         {/* Fallback to Dashboard if authenticated, else Login */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </Suspense>
   );
