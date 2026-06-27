@@ -1,178 +1,55 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 import styled from 'styled-components';
-import { Form, Input, Button, Checkbox, Alert, Typography, Divider } from 'antd';
+import { Form, Input, Alert, Checkbox, Typography } from 'antd';
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { useAuth } from '../../modules/auth/hooks/useAuth';
-import { Navigate, useNavigate } from 'react-router-dom';
+import { Navigate, useNavigate, Link as RouterLink } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { selectAuthError } from '../../modules/auth/selectors';
-import loginBg from '../../assets/images/login_bg.png';
+import Button from '../../components/common/Button';
+import AuthLayout from './components/AuthLayout';
+import AuthHeader from './components/AuthHeader';
+import AuthFooter from './components/AuthFooter';
 
-const { Title, Text, Link } = Typography;
+const { Text } = Typography;
 
-// --- STYLED COMPONENTS (Theme Integration) ---
+// ─── Styled ───────────────────────────────────────────────────────────────────
 
-const PageContainer = styled.div`
-  display: flex;
-  min-height: 100vh;
-  width: 100%;
-  font-family: ${({ theme }) => theme.typography.family};
-  background-color: ${({ theme }) => theme.colors.neutral.background};
-
-  /* Mobile Layout: Stack vertically */
-  flex-direction: column;
-  
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    flex-direction: row;
-  }
-`;
-
-// Left Side - Branding Section
-const BrandingSection = styled.div`
-  display: flex;
-  flex: 1;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  background-image: url(${loginBg});
-  background-size: cover;
-  background-position: center;
-  position: relative;
-  padding: ${({ theme }) => theme.spacing.xxxl};
-  min-height: 300px;
-  
-  /* Modern Gradient Overlay */
-  &::before {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: linear-gradient(135deg, rgba(0, 82, 204, 0.8) 0%, rgba(10, 25, 47, 0.9) 100%);
-  }
-
-  @media (min-width: ${({ theme }) => theme.breakpoints.tablet}) {
-    min-height: 100vh;
-  }
-`;
-
-const BrandContent = styled.div`
-  position: relative;
-  z-index: 10;
-  text-align: center;
-  color: ${({ theme }) => theme.colors.neutral.surface};
-`;
-
-const BrandLogo = styled.div`
-  font-size: 48px;
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  color: ${({ theme }) => theme.colors.neutral.surface};
-`;
-
-const BrandTagline = styled.h1`
-  font-size: ${({ theme }) => theme.typography.sizes.h1};
-  font-weight: ${({ theme }) => theme.typography.weights.bold};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-  color: ${({ theme }) => theme.colors.neutral.surface};
-`;
-
-const BrandDescription = styled.p`
-  font-size: ${({ theme }) => theme.typography.sizes.body};
-  opacity: 0.8;
-  max-width: 400px;
-  margin: 0 auto;
-`;
-
-// Right Side - Login Section
-const FormSection = styled.div`
-  display: flex;
-  flex: 1;
-  justify-content: center;
-  align-items: center;
-  padding: ${({ theme }) => theme.spacing.lg};
-  background-color: ${({ theme }) => theme.colors.neutral.background};
-`;
-
-const StyledCard = styled.div`
-  width: 100%;
-  max-width: 420px; /* Enterprise Spec Desktop Width */
-  background: ${({ theme }) => theme.colors.neutral.surface};
-  padding: ${({ theme }) => theme.spacing.xl};
-  border-radius: ${({ theme }) => theme.radius.card};
-  box-shadow: ${({ theme }) => theme.shadows.md};
-  
-  /* Mobile Spec: 100% width handled by max-width above */
-`;
-
-const CardHeader = styled.div`
-  text-align: center;
-  margin-bottom: ${({ theme }) => theme.spacing.xl};
-`;
-
-const StyledTitle = styled(Title)`
-  && {
-    color: ${({ theme }) => theme.colors.neutral.textPrimary};
-    margin-bottom: ${({ theme }) => theme.spacing.xs};
-    font-weight: ${({ theme }) => theme.typography.weights.bold};
-  }
-`;
-
-const StyledText = styled(Text)`
-  color: ${({ theme }) => theme.colors.neutral.textSecondary};
-`;
-
-// Ant Design Overrides to match theme
 const StyledForm = styled(Form)`
-  .ant-input-affix-wrapper, .ant-input {
-    padding: 12px 16px;
+  .ant-input-affix-wrapper,
+  .ant-input {
+    padding: 11px 14px;
     border-radius: ${({ theme }) => theme.radius.medium};
     border-color: ${({ theme }) => theme.colors.neutral.border};
-    
-    &:hover, &:focus, &-focused {
+    transition: ${({ theme }) => theme.transitions.fast};
+
+    &:hover {
       border-color: ${({ theme }) => theme.colors.primary.main};
-      box-shadow: none;
+    }
+
+    &-focused,
+    &:focus {
+      border-color: ${({ theme }) => theme.colors.primary.main};
+      box-shadow: ${({ theme }) => theme.shadows.inputFocus};
     }
   }
 
   .ant-form-item-label > label {
     color: ${({ theme }) => theme.colors.neutral.textPrimary};
     font-weight: ${({ theme }) => theme.typography.weights.medium};
+    font-size: ${({ theme }) => theme.typography.sizes.caption};
   }
-  
+
+  .ant-form-item-explain-error {
+    font-size: ${({ theme }) => theme.typography.sizes.label};
+    margin-top: 2px;
+  }
+
   .ant-checkbox-checked .ant-checkbox-inner {
     background-color: ${({ theme }) => theme.colors.primary.main};
     border-color: ${({ theme }) => theme.colors.primary.main};
   }
-`;
-
-const SubmitButton = styled(Button)`
-  && {
-    width: 100%;
-    height: 48px;
-    background: ${({ theme }) => theme.colors.primary.gradient};
-    border: none;
-    border-radius: ${({ theme }) => theme.radius.button};
-    font-size: ${({ theme }) => theme.typography.sizes.body};
-    font-weight: ${({ theme }) => theme.typography.weights.semibold};
-    margin-top: ${({ theme }) => theme.spacing.md};
-
-    &:hover, &:focus {
-      opacity: 0.9;
-      transform: translateY(-1px);
-      box-shadow: ${({ theme }) => theme.shadows.sm};
-      color: white;
-    }
-    
-    &[disabled] {
-      background: ${({ theme }) => theme.colors.neutral.disabled};
-      color: ${({ theme }) => theme.colors.neutral.surface};
-    }
-  }
-`;
-
-const FormFooter = styled.div`
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
 `;
 
 const StyledAlert = styled(Alert)`
@@ -181,23 +58,77 @@ const StyledAlert = styled(Alert)`
     border-radius: ${({ theme }) => theme.radius.medium};
     background-color: ${({ theme }) => theme.colors.semantic.error.background};
     border-color: ${({ theme }) => theme.colors.semantic.error.background};
-    
+
     .ant-alert-message {
       color: ${({ theme }) => theme.colors.semantic.error.main};
+      font-size: ${({ theme }) => theme.typography.sizes.caption};
     }
   }
 `;
 
+const FormFooterRow = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: ${({ theme }) => theme.spacing.lg};
+`;
 
-// --- COMPONENT LOGIC ---
+const ForgotLink = styled(RouterLink)`
+  font-size: ${({ theme }) => theme.typography.sizes.caption};
+  color: ${({ theme }) => theme.colors.primary.main};
+  font-weight: ${({ theme }) => theme.typography.weights.medium};
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary.hover};
+    text-decoration: underline;
+  }
+`;
+
+const SubmitButton = styled(Button)`
+  && {
+    width: 100%;
+    height: 48px;
+    font-size: ${({ theme }) => theme.typography.sizes.body};
+    font-weight: ${({ theme }) => theme.typography.weights.semibold};
+    background: ${({ theme }) => theme.colors.primary.gradient};
+    border: none;
+
+    &:hover:not([disabled]) {
+      opacity: 0.92;
+      transform: translateY(-1px);
+      box-shadow: ${({ theme }) => theme.shadows.sm};
+      color: ${({ theme }) => theme.colors.neutral.surface};
+    }
+  }
+`;
+
+const SignUpRow = styled.div`
+  text-align: center;
+  margin-top: ${({ theme }) => theme.spacing.md};
+  font-size: ${({ theme }) => theme.typography.sizes.caption};
+`;
+
+const RegisterLink = styled.span`
+  color: ${({ theme }) => theme.colors.primary.main};
+  font-weight: ${({ theme }) => theme.typography.weights.semibold};
+  cursor: pointer;
+  margin-left: 4px;
+
+  &:hover {
+    color: ${({ theme }) => theme.colors.primary.hover};
+    text-decoration: underline;
+  }
+`;
+
+// ─── Component ────────────────────────────────────────────────────────────────
 
 const LoginPage = () => {
   const { login, loading, isAuthenticated } = useAuth();
   const error = useSelector(selectAuthError);
   const navigate = useNavigate();
-  
   const [form] = Form.useForm();
 
+  // Already logged in → redirect
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
@@ -207,97 +138,93 @@ const LoginPage = () => {
   };
 
   return (
-    <PageContainer>
-      <BrandingSection>
-        <BrandContent>
-          <BrandLogo>
-            <UserOutlined /> {/* Placeholder Logo */}
-          </BrandLogo>
-          <BrandTagline>Smart Healthcare Management Platform</BrandTagline>
-          <BrandDescription>
-            Manage patients, appointments, billing and clinical workflows securely.
-          </BrandDescription>
-        </BrandContent>
-      </BrandingSection>
+    <AuthLayout>
+      <AuthHeader
+        title="Welcome Back"
+        subtitle="Sign in to continue to your healthcare dashboard"
+      />
 
-      <FormSection>
-        <StyledCard>
-          <CardHeader>
-            <StyledTitle level={2}>Welcome Back</StyledTitle>
-            <StyledText>Login to continue to your healthcare dashboard</StyledText>
-          </CardHeader>
+      {error && (
+        <StyledAlert message={error} type="error" showIcon closable />
+      )}
 
-          {error && <StyledAlert message={error} type="error" showIcon />}
+      <StyledForm
+        form={form}
+        name="login_form"
+        layout="vertical"
+        onFinish={onFinish}
+        requiredMark={false}
+        autoComplete="off"
+      >
+        {/* Email */}
+        <Form.Item
+          name="email"
+          label="Email Address"
+          rules={[
+            { required: true, message: 'Email is required.' },
+            { type: 'email', message: 'Enter a valid email address.' },
+          ]}
+        >
+          <Input
+            prefix={<UserOutlined />}
+            placeholder="doctor@hospital.com"
+            size="large"
+            disabled={loading}
+            autoComplete="email"
+          />
+        </Form.Item>
 
-          <StyledForm
-            form={form}
-            name="login_form"
-            layout="vertical"
-            onFinish={onFinish}
-            requiredMark={false}
+        {/* Password */}
+        <Form.Item
+          name="password"
+          label="Password"
+          rules={[
+            { required: true, message: 'Password is required.' },
+            { min: 6, message: 'Password must be at least 6 characters.' },
+          ]}
+        >
+          <Input.Password
+            prefix={<LockOutlined />}
+            placeholder="••••••••"
+            size="large"
+            disabled={loading}
+            autoComplete="current-password"
+          />
+        </Form.Item>
+
+        {/* Remember me + Forgot password */}
+        <FormFooterRow>
+          <Form.Item name="remember" valuePropName="checked" noStyle>
+            <Checkbox disabled={loading}>
+              <Text style={{ fontSize: '13px' }}>Remember me</Text>
+            </Checkbox>
+          </Form.Item>
+          <ForgotLink to="/forgot-password">Forgot password?</ForgotLink>
+        </FormFooterRow>
+
+        {/* Submit */}
+        <Form.Item noStyle>
+          <SubmitButton
+            variant="primary"
+            htmlType="submit"
+            loading={loading}
+            disabled={loading}
           >
-            <Form.Item
-              name="email"
-              label="Email Address"
-              rules={[
-                { required: true, message: 'Please input your email!' },
-                { type: 'email', message: 'Please enter a valid email format!' }
-              ]}
-            >
-              <Input 
-                prefix={<UserOutlined style={{ color: '#64748B' }} />} 
-                placeholder="doctor@hospital.com" 
-                size="large"
-                disabled={loading}
-              />
-            </Form.Item>
+            Sign In
+          </SubmitButton>
+        </Form.Item>
+      </StyledForm>
 
-            <Form.Item
-              name="password"
-              label="Password"
-              rules={[
-                { required: true, message: 'Please input your password!' },
-                { min: 6, message: 'Password must be at least 6 characters.' }
-              ]}
-            >
-              <Input.Password 
-                prefix={<LockOutlined style={{ color: '#64748B' }} />} 
-                placeholder="••••••••" 
-                size="large"
-                disabled={loading}
-              />
-            </Form.Item>
+      {/* Register link */}
+      <SignUpRow>
+        <Text type="secondary">Don't have an account?</Text>
+        <RegisterLink onClick={() => navigate('/register')}>
+          Register here
+        </RegisterLink>
+      </SignUpRow>
 
-            <FormFooter>
-              <Form.Item name="remember" valuePropName="checked" noStyle>
-                <Checkbox disabled={loading}>Remember me</Checkbox>
-              </Form.Item>
-              <Link href="#" style={{ color: '#0052CC' }}>
-                Forgot password?
-              </Link>
-            </FormFooter>
-
-            <Form.Item>
-              <SubmitButton type="primary" htmlType="submit" loading={loading}>
-                Sign In
-              </SubmitButton>
-            </Form.Item>
-
-            <div style={{ textAlign: 'center', marginTop: '16px' }}>
-              <Text type="secondary">Don't have an account? </Text>
-              <Link onClick={() => navigate('/register')} style={{ color: '#0052CC', fontWeight: 600 }}>
-                Register here
-              </Link>
-            </div>
-            
-          </StyledForm>
-          
-          <Divider plain>
-            <Text type="secondary" style={{ fontSize: '12px' }}>Enterprise Secure Login</Text>
-          </Divider>
-        </StyledCard>
-      </FormSection>
-    </PageContainer>
+      <AuthFooter />
+    </AuthLayout>
   );
 };
 
