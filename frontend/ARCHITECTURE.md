@@ -1,737 +1,521 @@
-# Healthcare Management System Frontend Architecture
+# Healthcare SaaS Multi-Tenant Architecture
 
-## 1. Project Goal
+## Overview
 
-## Healthcare Management System Frontend
+This application is a multi-tenant healthcare SaaS platform.
 
-Goal:
+Each hospital/organization is a separate tenant.
 
-Build a scalable, secure, multi-tenant healthcare SaaS dashboard.
+The architecture uses:
 
-Users:
+- Database per tenant
+- Tenant-based subdomains
+- Central master database
+- Dynamic database connection
+- Tenant-driven frontend routing
+- Backend-driven theme configuration
 
-- Admin
-- Doctor
-- Nurse
-- Receptionist
-- Pharmacist
-- Patient
+---
 
+# High Level Architecture
 
-Main Focus:
+                Master Domain
 
-- Security
-- Performance
-- Maintainability
-- Scalability
-- Consistent UI
-- Clean architecture
+            localhost:3000
+
+                   |
+                   |
+          Landing / Registration
+
+                   |
+                   |
+         Create Tenant Workspace
+
+                   |
+                   |
+    ---------------------------------
+
+    Tenant Workspace
+
+    hospital1.lvh.me:3000
+
+                |
+                |
+         Tenant Application
+
+                |
+                |
+    hospital1.lvh.me:8000/api/*
+
+                |
+                |
+      Dynamic Tenant Database
+
+---
+
+# Backend Architecture
+
+## Technology
+
+- PHP
+- MySQL
+- REST API
+- Session / JWT authentication
+- Dynamic database switching
 
 
 ---
 
-# 2. Tech Stack
+# Database Design
 
-Core:
+## Master Database
 
-- React.js
-- Redux Toolkit
-- Redux Saga
-- React Router
-- Axios
-- styled-components
+Database:
+
+
+master_db
 
 
 
-UI:
+The master database stores global information only.
 
-Primary UI Library:
-
-- Ant Design
-
-
-Supported UI Libraries:
-
-- Semantic UI React
-- Material UI
-
-
-Rules:
-
-- Do not mix UI libraries randomly.
-- Use Ant Design for enterprise components.
-- Wrap UI library components when required.
-- Follow theme tokens.
+It does NOT store tenant business data.
 
 
 ---
 
-# 3. Application Architecture
+## tenants table
+
+Stores all organizations.
+
+Example:
 
 
-The application follows a modular architecture.
+tenants
+
+id
+name
+subdomain
+plan
+database_name
+theme_config
+created_at
 
 
-Every business feature must be isolated.
 
+Example:
 
-Modules contain:
+```json
+{
+ "id":"uuid",
+ "name":"Apollo Hospital",
+ "subdomain":"apollo771",
+ "database_name":"tenant_apollo771_db",
+ "plan":"pro",
+ "theme_config":{
+    "mode":"warm",
+    "primaryColor":"#2563EB",
+    "fontFamily":"Inter"
+ }
+}
+domains table
 
-- Redux state
-- API layer
-- Hooks
-- Components
-- Pages
+Maps domains to tenants.
 
+Structure:
 
-Do not put business logic directly inside components.
+domains
 
+id
+tenant_id
+domain
+type
+created_at
 
----
+Example:
 
-# 4. Folder Structure
+tenant_id:
+abc123
 
+domain:
+apollo771.lvh.me
 
-src/
+type:
+subdomain
+Tenant Database
 
-```
+Every tenant gets a separate database.
+
+Example:
+
+tenant_apollo771_db
+
+Contains:
+
+users
+patients
+appointments
+billing
+staff
+etc...
+
+Tenant data never goes into master_db.
+
+Tenant Creation Flow
+
+User opens:
+
+localhost:3000
+
+Clicks:
+
+Register
+
+Frontend sends:
+
+POST /api/tenants/register
+
+Backend:
+
+Creates tenant record
+Creates tenant database
+
+Example:
+
+tenant_apollo771_db
+Runs tenant migrations
+Creates admin user
+Returns:
+{
+ "success":true,
+ "tenant_url":
+ "http://apollo771.lvh.me:3000",
+
+ "tenant_id":"uuid"
+}
+
+Frontend redirects:
+
+apollo771.lvh.me:3000/login
+Tenant Detection
+
+Every request contains:
+
+Host header
+
+Example:
+
+apollo771.lvh.me
+
+Backend extracts:
+
+apollo771
+
+TenantMiddleware:
+
+hostname
+      |
+      |
+find domain
+      |
+      |
+load tenant
+      |
+      |
+switch database
+Authentication Flow
+Tenant Login
+
+URL:
+
+apollo771.lvh.me:3000/login
+
+Frontend sends:
+
+POST /api/login
+
+Payload:
+
+{
+ "email":"",
+ "password":""
+}
+
+IMPORTANT:
+
+Do NOT send:
+
+tenant_id
+
+Tenant is detected from domain.
+
+Backend:
+
+Host
+ |
+ |
+TenantMiddleware
+ |
+ |
+tenant_apollo771_db
+ |
+ |
+authenticate user
+Public Login Flow
+
+When user opens:
+
+localhost:3000/login
+
+Show:
+
+Workspace Name
+
+Continue
+
+Example:
+
+apollo771
+
+Redirect:
+
+apollo771.lvh.me:3000/login
+
+Then normal login happens.
+
+Returning User Flow
+
+After login save:
+
+localStorage.setItem(
+"tenant_workspace",
+"apollo771"
+)
+
+When user opens website again:
+
+localhost:3000
+
+Frontend checks:
+
+tenant_workspace
+
+If exists:
+
+Show:
+
+Welcome back
+
+Apollo Hospital
+
+Continue Login
+
+Redirect:
+
+apollo771.lvh.me/login
+Frontend Architecture
+Structure
 src
-│
+
 ├── app
-│   ├── store.js
-│   ├── rootReducer.js
-│   ├── rootSaga.js
-│   └── sagaMiddleware.js
-│
-├── config
-│   ├── environment.js
-│   ├── tenantConfig.js
-│   └── apiEndpoints.js
-│
-├── services
-│   ├── axiosClient.js
-│   ├── apiService.js
-│   ├── tokenService.js
-│   └── encryptionService.js
 │
 ├── modules
-│
+│   |
 │   ├── auth
-│   │   ├── authSlice.js
-│   │   ├── authSaga.js
-│   │   ├── authAPI.js
-│   │   └── hooks
-│   │       └── useAuth.js
-│
 │   ├── tenant
-│   │   ├── tenantSlice.js
-│   │   ├── tenantSaga.js
-│   │   ├── tenantAPI.js
-│   │   └── hooks
-│   │       └── useTenant.js
-│
-│   ├── patients
-│   │   ├── patientSlice.js
-│   │   ├── patientSaga.js
-│   │   ├── patientAPI.js
-│   │   └── hooks
-│   │       └── usePatients.js
-│
-│   ├── appointments
-│   │   ├── appointmentSlice.js
-│   │   ├── appointmentSaga.js
-│   │   ├── appointmentAPI.js
-│   │   └── hooks
-│   │       └── useAppointments.js
-│
-│   └── other modules
-│
-│
-├── components
-│
-│   ├── common
-│   │   ├── Button
-│   │   ├── Input
-│   │   ├── Card
-│   │   ├── Table
-│   │   ├── Modal
-│   │   └── Loader
-│
-│   ├── layout
-│   │   ├── Header
-│   │   ├── Sidebar
-│   │   ├── Footer
-│   │   └── DashboardLayout
 │
 ├── pages
 │
 ├── routes
-│   ├── AppRouter.jsx
-│   ├── ProtectedRoute.jsx
-│   └── RoleBasedRoute.jsx
+│
+├── services
 │
 ├── themes
-│   ├── darkTheme.js
-│   ├── warmTheme.js
-│   └── GlobalStyles.js
 │
-├── hooks
-│
-├── utils
-│
-└── assets
-```
+└── utils
 
+Redux Structure
+authSlice
 
----
+Handles:
 
-# 5. Module Structure Rule
+login
+logout
+user
+token
+tenantSlice
 
+Handles:
 
-Every module must contain:
+registration
+tenant details
+theme config
 
+State:
 
-```
-moduleName/
+{
+ loading:false,
 
-moduleSlice.js
+ tenantDetails:{
+   tenant_url:"",
+   subdomain:""
+ },
 
-moduleSaga.js
+ themeConfig:{}
+}
+API Layer
 
-moduleAPI.js
+All APIs go through:
 
-selectors.js
-
-hooks/
-
-components/
-
-pages/
-```
-
+apiService.js
 
 Example:
 
+apiService.post(
+"/api/login",
+data
+)
 
-```
-patients/
+Do not call axios directly inside components.
 
-patientSlice.js
+Theme System
 
-patientSaga.js
+Themes are tenant-specific.
 
-patientAPI.js
+Existing:
 
-hooks/usePatients.js
+src/themes
 
-components/PatientCard.jsx
+darkTheme.js
+warmTheme.js
+GlobalStyle.js
 
-pages/PatientList.jsx
-```
+Add:
 
-
----
-
-# 6. Redux Saga Flow
-
-
-All server communication uses Redux Saga.
-
-
-Flow:
-
-
-```
-Component
-
-↓
-
-Custom Hook
-
-↓
-
-dispatch()
-
-↓
-
-Slice Action
-
-↓
-
-Saga
-
-↓
-
-API Service
-
-↓
-
-Backend
-
-↓
-
-Saga Response
-
-↓
-
-Slice Update
-
-↓
-
-UI Update
-```
-
-
-Rules:
-
-- No API calls inside components.
-- No axios inside components.
-- No fetch inside components.
-
-
----
-
-# 7. Axios API Architecture
-
-
-All API requests must use:
-
-
-```
-services/axiosClient.js
-```
-
+tenantTheme.js
 
 Responsibilities:
 
+merge backend config
+override colors
+override fonts
+override radius
 
-- Base URL
-- JWT token injection
-- Refresh token
-- CSRF token
-- Tenant headers
-- Error handling
+Example backend:
 
+{
+ "mode":"dark",
+ "primaryColor":"#00AEEF",
+ "fontFamily":"Inter",
+ "borderRadius":"8px"
+}
 
-Never use:
+Frontend:
 
+ThemeProvider
 
-```js
-axios.get()
-axios.post()
-```
+      |
+      |
+createTenantTheme()
 
+      |
+      |
+styled-components
+Theme API
 
-inside:
+Tenant loads:
 
-- Components
-- Pages
-- Hooks
+GET /api/tenants/theme
 
+Response:
 
----
+{
+ "theme_config":{
 
-# 8. Authentication Module
+ "mode":"warm",
+ "primaryColor":"#2563EB",
+ "fontFamily":"Poppins"
 
+ }
+}
+Local Development
+Frontend
 
-Features:
+Run:
 
+npm install
 
-- Login
-- Logout
-- Token validation
-- Refresh token
-- Session restore
-- Auto logout
+npm run dev
 
+Open:
 
-Flow:
+http://localhost:3000
 
+Tenant:
 
-```
-Login Page
+http://apollo771.lvh.me:3000
+Backend
 
-↓
+Start:
 
-authSaga
+php -S localhost:8000 -t public
 
-↓
+Backend:
 
-Backend Login API
-
-↓
-
-Store Token
-
-↓
-
-Save User Role
-
-↓
-
-Redirect
-```
-
-
----
-
-# 9. Role Based Access Control
-
-
-Supported Roles:
-
-
-- ADMIN
-- DOCTOR
-- NURSE
-- RECEPTIONIST
-- PHARMACIST
-- PATIENT
-
-
-Protected routes must use:
-
-
-```
-ProtectedRoute
-
-RoleBasedRoute
-```
-
-
-Role access:
-
-
-Admin:
-
-- Staff management
-- Billing
-- Settings
-
-
-Doctor:
-
-- Patients
-- Appointments
-- Prescriptions
-
-
-Nurse:
-
-- Patients
-- Appointments
-
-
-Patient:
-
-- Own data only
-
-
----
-
-# 10. Multi Tenant System
-
-
-Tenant flow:
-
-
-```
-Domain
-
-↓
-
-Tenant Detection
-
-↓
-
-Tenant API
-
-↓
-
-tenantSlice
-
-↓
-
-Theme Load
-```
-
-
-Tenant controls:
-
-
-- Logo
-- Colors
-- Branding
-- Theme
-
-
----
-
-# 11. Theme System
-
-
-Use:
-
-
-```
-styled-components ThemeProvider
-```
-
-
-Theme files:
-
-
-```
-themes/
-
-darkTheme.js
-
-warmTheme.js
-```
-
-
-All styling must use:
-
-
-```
-theme.colors
-
-theme.spacing
-
-theme.radius
-
-theme.typography
-
-theme.shadow
-```
-
-
-Never hardcode:
-
-
-```css
-color:red;
-background:#fff;
-```
-
-
----
-
-# 12. UI Component Rules
-
-
-Reusable components:
-
-
-```
-components/common
-```
-
-
-Contains:
-
-
-- Button
-- Input
-- Card
-- Table
-- Modal
-- Loader
-
-
-Do not directly use Ant Design components inside modules.
-
+http://localhost:8000
+Important Development Rules
+DO
+Always test tenant URLs with lvh.me
 
 Example:
 
+apollo771.lvh.me
+Keep tenant logic in middleware
+Keep API calls inside modules
+DO NOT
 
-Wrong:
+Do not:
 
-```js
-import { Button } from "antd"
-```
+send tenant_id from frontend login
 
+Do not:
 
-Correct:
+store tenant data in master_db
 
+Do not:
 
-```js
-import Button from components/common/Button
-```
+hardcode localhost tenant URLs
+Complete User Journey
+Landing Page
 
+      |
 
----
+Register Organization
 
-# 13. UI Library Rules
+      |
 
+Tenant Created
 
-Primary:
+      |
 
+apollo771.lvh.me/login
 
-Ant Design
+      |
 
+Login
 
-Use for:
+      |
 
+Tenant Database Connected
 
-- Table
-- Form
-- Modal
-- Select
-- DatePicker
-- Pagination
-- Layout
+      |
 
+Dashboard
 
-Rules:
+      |
 
+Theme Loaded
 
-- Do not use default Ant colors.
-- Apply theme tokens.
-- Keep reusable wrappers.
-- Avoid duplicate components.
+      |
 
-
----
-
-# 14. Responsive Rules
-
-
-Desktop:
-
-1440px
-
-
-Tablet:
-
-768px
-
-
-Mobile:
-
-390px
-
-
-Use:
-
-
-- Flex
-- Grid
-- Responsive breakpoints
-
-
-Every module must support:
-
-
-Desktop
-
-Tablet
-
-Mobile
-
-
----
-
-# 15. Security Rules
-
-
-Frontend security:
-
-
-- CSRF protection
-- Token rotation
-- Refresh token
-- Idle logout
-- Role protection
-- Secure requests
-
-
-Security module:
-
-
-```
-modules/security
-```
-
-
----
-
-# 16. Module Completion Checklist
-
-
-Every module requires:
-
-
-✓ UI Page
-
-✓ Redux Slice
-
-✓ Saga
-
-✓ API Service
-
-✓ Custom Hook
-
-✓ Loading State
-
-✓ Error State
-
-✓ Empty State
-
-✓ Permission Check
-
-✓ Responsive UI
-
-
----
-
-# 17. AI Development Rules
-
-
-When generating code:
-
-
-1. Follow existing folder structure.
-
-2. Do not create unnecessary files.
-
-3. Do not install new libraries.
-
-4. Reuse existing components.
-
-5. Use theme variables.
-
-6. Do not hardcode colors.
-
-7. Use Redux flow.
-
-8. Do not call API directly.
-
-9. Check existing code first.
-
-10. Keep components reusable.
-
-
----
-
-# Final Goal
-
-
-This architecture supports:
-
-
-✓ Healthcare SaaS Platform
-
-✓ Multi Tenant System
-
-✓ Secure Authentication
-
-✓ Redux Saga Architecture
-
-✓ Role Based Access
-
-✓ Scalable Modules
-
-✓ Production Level UI
-
-✓ Maintainable Codebase
+Application Ready
