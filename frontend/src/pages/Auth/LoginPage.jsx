@@ -286,7 +286,10 @@ const LoginPage = () => {
       {/* Register link */}
       <SignUpRow>
         <Text type="secondary">Don't have an account?</Text>
-        <RegisterLink onClick={() => navigate('/register')}>
+        <RegisterLink onClick={() => {
+          const port = window.location.port ? `:${window.location.port}` : '';
+          window.location.href = `${window.location.protocol}//${environment.BASE_DOMAIN}${port}/register`;
+        }}>
           Register here
         </RegisterLink>
       </SignUpRow>
