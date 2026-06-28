@@ -8,6 +8,7 @@ import { useSelector } from 'react-redux';
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { selectAuthError } from '../../modules/auth/selectors';
 import { getTenantFromDomain } from '../../utils/tenant';
+import { environment } from '../../config/environment';
 import Button from '../../components/common/Button';
 import AuthLayout from './components/AuthLayout';
 import AuthHeader from './components/AuthHeader';
@@ -143,6 +144,66 @@ const LoginPage = () => {
   const subtitle = subdomain 
     ? `Sign in to your ${subdomain.charAt(0).toUpperCase() + subdomain.slice(1)} workspace`
     : "Sign in to continue to your healthcare dashboard";
+
+  const onWorkspaceSubmit = (values) => {
+    const workspaceName = values.workspace.trim().toLowerCase();
+    const port = window.location.port ? `:${window.location.port}` : '';
+    window.location.href = `${window.location.protocol}//${workspaceName}.${environment.BASE_DOMAIN}${port}/login`;
+  };
+
+  if (!subdomain) {
+    return (
+      <AuthLayout>
+        <AuthHeader
+          title="Find Your Workspace"
+          subtitle="Enter your workspace name to sign in to your dashboard"
+        />
+
+        <StyledForm
+          form={form}
+          name="workspace_form"
+          layout="vertical"
+          onFinish={onWorkspaceSubmit}
+          requiredMark={false}
+          autoComplete="off"
+        >
+          <Form.Item
+            name="workspace"
+            label="Workspace Name"
+            rules={[
+              { required: true, message: 'Workspace name is required.' },
+              { pattern: /^[a-z0-9-]+$/, message: 'Workspace name can only contain lowercase letters, numbers, and hyphens.' }
+            ]}
+          >
+            <Input
+              placeholder="e.g. apollo"
+              size="large"
+              addonAfter={`.${environment.BASE_DOMAIN}`}
+              autoComplete="off"
+            />
+          </Form.Item>
+
+          <Form.Item noStyle>
+            <SubmitButton
+              variant="primary"
+              htmlType="submit"
+            >
+              Continue
+            </SubmitButton>
+          </Form.Item>
+        </StyledForm>
+
+        <SignUpRow>
+          <Text type="secondary">Don't have a workspace?</Text>
+          <RegisterLink onClick={() => navigate('/register')}>
+            Create one
+          </RegisterLink>
+        </SignUpRow>
+
+        <AuthFooter />
+      </AuthLayout>
+    );
+  }
 
   return (
     <AuthLayout>

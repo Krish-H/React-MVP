@@ -35,8 +35,8 @@ const AppRouter = () => {
             {/* Public Domain Routes */}
             <Route path="/" element={<LandingPage />} />
             <Route path="/register" element={<RegisterPage />} />
-            {/* If users go to /login on public domain, redirect to landing page */}
-            <Route path="/login" element={<Navigate to="/" replace />} />
+            {/* Public Login / Workspace Discovery */}
+            <Route path="/login" element={<LoginPage />} />
             <Route path="/forgot-password" element={<Navigate to="/" replace />} />
           </>
         )}
