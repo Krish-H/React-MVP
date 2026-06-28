@@ -3,6 +3,7 @@ import { Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 import Loader from '../components/common/Loader';
+import { getTenantFromDomain } from '../utils/tenant';
 
 // Lazy loading the pages
 const LoginPage = lazy(() => import('../pages/Auth/LoginPage'));
@@ -14,16 +15,31 @@ const PatientList = lazy(() => import('../pages/Patients/PatientList'));
 const AppointmentList = lazy(() => import('../pages/Appointments/AppointmentList'));
 const InvoicePage = lazy(() => import('../pages/Billing/InvoicePage'));
 const StaffManagement = lazy(() => import('../pages/Staff/StaffManagement'));
+const ThemeSettings = lazy(() => import('../pages/Settings/ThemeSettings'));
 
 const AppRouter = () => {
+  const tenant = getTenantFromDomain();
+
   return (
     <Suspense fallback={<Loader />}>
       <Routes>
-        {/* Public Routes */}
-        <Route path="/" element={<LandingPage />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<RegisterPage />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+        {tenant ? (
+          <>
+            {/* Tenant Domain Routes */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/forgot-password" element={<ForgotPassword />} />
+          </>
+        ) : (
+          <>
+            {/* Public Domain Routes */}
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/register" element={<RegisterPage />} />
+            {/* If users go to /login on public domain, redirect to landing page */}
+            <Route path="/login" element={<Navigate to="/" replace />} />
+            <Route path="/forgot-password" element={<Navigate to="/" replace />} />
+          </>
+        )}
 
         {/* Protected Routes inside Main Layout */}
         <Route 
@@ -42,15 +58,16 @@ const AppRouter = () => {
             <Route path="/appointments" element={<AppointmentList />} />
           </Route>
 
-          {/* Billing available to Admin only */}
+          {/* Admin only routes */}
           <Route element={<RoleBasedRoute allowedRoles={['admin']} />}>
             <Route path="/billing" element={<InvoicePage />} />
             <Route path="/staff" element={<StaffManagement />} />
+            <Route path="/settings/theme" element={<ThemeSettings />} />
           </Route>
         </Route>
 
-        {/* Fallback to Dashboard if authenticated, else Login */}
-        <Route path="*" element={<Navigate to="/" replace />} />
+        {/* Fallback */}
+        <Route path="*" element={<Navigate to={tenant ? "/login" : "/"} replace />} />
       </Routes>
     </Suspense>
   );

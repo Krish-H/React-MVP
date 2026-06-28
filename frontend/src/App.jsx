@@ -10,6 +10,9 @@ import { initializeAuthRequest } from './modules/auth/authSlice';
 import { selectAuthInitialized } from './modules/auth/selectors';
 import { useIdleLogout } from './hooks/useIdleLogout';
 import { warmTheme } from './themes/warmTheme';
+import { createTenantTheme } from './themes/tenantTheme';
+import { getTenantFromDomain } from './utils/tenant';
+import { fetchThemeRequest } from './modules/tenant/tenantSlice';
 
 const AppInitializer = () => {
   const dispatch = useDispatch();
@@ -29,15 +32,37 @@ const AppInitializer = () => {
   return <AppRouter />;
 };
 
+const ThemeWrapper = ({ children }) => {
+  const dispatch = useDispatch();
+  const tenantName = getTenantFromDomain();
+  
+  const themeConfig = useSelector((state) => state.tenant.themeConfig);
+  const themeLoading = useSelector((state) => state.tenant.themeLoading);
+
+  useEffect(() => {
+    if (tenantName && !themeConfig) {
+      dispatch(fetchThemeRequest());
+    }
+  }, [dispatch, tenantName, themeConfig]);
+
+  const activeTheme = tenantName && themeConfig ? createTenantTheme(themeConfig) : warmTheme;
+
+  return (
+    <ThemeProvider theme={activeTheme}>
+      {children}
+    </ThemeProvider>
+  );
+};
+
 const App = () => {
   return (
     <ErrorBoundary>
       <Provider store={store}>
-        <ThemeProvider theme={warmTheme}>
+        <ThemeWrapper>
           <BrowserRouter>
             <AppInitializer />
           </BrowserRouter>
-        </ThemeProvider>
+        </ThemeWrapper>
       </Provider>
     </ErrorBoundary>
   );

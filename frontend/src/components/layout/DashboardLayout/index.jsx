@@ -19,6 +19,9 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import MedicalServicesIcon from '@mui/icons-material/MedicalServices';
 import CloseIcon from '@mui/icons-material/Close';
+import PaletteIcon from '@mui/icons-material/Palette';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -32,7 +35,7 @@ const SidebarWrapper = styled.aside`
   top: 0;
   left: 0;
   bottom: 0;
-  width: ${props => props.collapsed ? '80px' : '260px'};
+  width: ${props => props.$collapsed ? '80px' : '260px'};
   background-color: #FFFFFF;
   border-right: 1px solid #E5E9F2;
   display: flex;
@@ -43,7 +46,7 @@ const SidebarWrapper = styled.aside`
   box-shadow: 0 4px 12px rgba(10, 25, 47, 0.02);
 
   @media (max-width: 768px) {
-    transform: ${props => props.mobileOpen ? 'translateX(0)' : 'translateX(-100%)'};
+    transform: ${props => props.$mobileOpen ? 'translateX(0)' : 'translateX(-100%)'};
     width: 260px;
     position: fixed;
     box-shadow: 0 4px 20px rgba(10, 25, 47, 0.08);
@@ -53,7 +56,7 @@ const SidebarWrapper = styled.aside`
 const SidebarOverlay = styled.div`
   display: none;
   @media (max-width: 768px) {
-    display: ${props => props.mobileOpen ? 'block' : 'none'};
+    display: ${props => props.$mobileOpen ? 'block' : 'none'};
     position: fixed;
     top: 0;
     left: 0;
@@ -67,7 +70,7 @@ const SidebarOverlay = styled.div`
 
 const MainContentWrapper = styled.div`
   flex: 1;
-  margin-left: ${props => props.collapsed ? '80px' : '260px'};
+  margin-left: ${props => props.$collapsed ? '80px' : '260px'};
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -105,11 +108,11 @@ const LogoArea = styled.div`
   color: #2563EB;
   white-space: nowrap;
   overflow: hidden;
-  justify-content: ${props => props.collapsed ? 'center' : 'flex-start'};
+  justify-content: ${props => props.$collapsed ? 'center' : 'flex-start'};
 `;
 
 const LogoText = styled.span`
-  display: ${props => props.collapsed ? 'none' : 'inline'};
+  display: ${props => props.$collapsed ? 'none' : 'inline'};
   font-weight: 800;
   font-size: 20px;
   letter-spacing: -0.5px;
@@ -134,22 +137,22 @@ const NavItem = styled.div`
   padding: 12px 16px;
   border-radius: 12px;
   cursor: pointer;
-  color: ${props => props.active ? '#2563EB' : '#64748B'};
-  background-color: ${props => props.active ? 'rgba(37, 99, 235, 0.06)' : 'transparent'};
-  font-weight: ${props => props.active ? '600' : '500'};
+  color: ${props => props.$active ? '#2563EB' : '#64748B'};
+  background-color: ${props => props.$active ? 'rgba(37, 99, 235, 0.06)' : 'transparent'};
+  font-weight: ${props => props.$active ? '600' : '500'};
   font-size: 14px;
   gap: 16px;
   transition: all 0.2s ease-in-out;
   position: relative;
-  justify-content: ${props => props.collapsed ? 'center' : 'flex-start'};
+  justify-content: ${props => props.$collapsed ? 'center' : 'flex-start'};
 
   &:hover {
     color: #2563EB;
-    background-color: ${props => props.active ? 'rgba(37, 99, 235, 0.06)' : 'rgba(37, 99, 235, 0.03)'};
-    transform: ${props => props.collapsed ? 'none' : 'translateX(4px)'};
+    background-color: ${props => props.$active ? 'rgba(37, 99, 235, 0.06)' : 'rgba(37, 99, 235, 0.03)'};
+    transform: ${props => props.$collapsed ? 'none' : 'translateX(4px)'};
   }
 
-  ${props => props.active && !props.collapsed && `
+  ${props => props.$active && !props.$collapsed && `
     &::before {
       content: '';
       position: absolute;
@@ -172,10 +175,29 @@ const NavItem = styled.div`
 `;
 
 const NavLabel = styled.span`
-  display: ${props => props.collapsed ? 'none' : 'inline'};
+  display: ${props => props.$collapsed ? 'none' : 'inline'};
   
   @media (max-width: 768px) {
     display: inline;
+  }
+`;
+
+const SubMenuWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 0.3s ease-in-out;
+  max-height: ${props => props.$isOpen ? '200px' : '0'};
+  opacity: ${props => props.$isOpen ? '1' : '0'};
+`;
+
+const SubMenuItem = styled(NavItem)`
+  padding-left: 48px;
+  margin-top: 4px;
+  background-color: ${props => props.$active ? 'rgba(37, 99, 235, 0.04)' : 'transparent'};
+  
+  &::before {
+    display: none;
   }
 `;
 
@@ -187,7 +209,7 @@ const SupportCard = styled.div`
   padding: 16px;
   text-align: center;
   position: relative;
-  display: ${props => props.collapsed ? 'none' : 'block'};
+  display: ${props => props.$collapsed ? 'none' : 'block'};
 
   @media (max-width: 768px) {
     display: block;
@@ -423,9 +445,10 @@ const CloseButton = styled.button`
 const DashboardLayout = ({ children }) => {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
-  const { user, logout } = useAuth();
+  const { user, role, logout } = useAuth();
 
   const menuItems = [
     { key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
@@ -445,7 +468,7 @@ const DashboardLayout = ({ children }) => {
       key: 'settings',
       icon: <SettingsIcon style={{ fontSize: 16 }} />,
       label: 'Settings',
-      onClick: () => navigate('/settings')
+      onClick: () => navigate(user?.role_id === 1 ? '/settings/theme' : '/settings/profile')
     },
     {
       type: 'divider',
@@ -465,12 +488,12 @@ const DashboardLayout = ({ children }) => {
 
   return (
     <LayoutContainer>
-      <SidebarOverlay mobileOpen={mobileOpen} onClick={() => setMobileOpen(false)} />
+      <SidebarOverlay $mobileOpen={mobileOpen} onClick={() => setMobileOpen(false)} />
       
-      <SidebarWrapper collapsed={collapsed} mobileOpen={mobileOpen}>
-        <LogoArea collapsed={collapsed}>
+      <SidebarWrapper $collapsed={collapsed} $mobileOpen={mobileOpen}>
+        <LogoArea $collapsed={collapsed}>
           <MedicalServicesIcon style={{ fontSize: 24, color: '#2563EB' }} />
-          <LogoText collapsed={collapsed}>HealthManager</LogoText>
+          <LogoText $collapsed={collapsed}>HealthManager</LogoText>
           <CloseButton onClick={() => setMobileOpen(false)}>
             <CloseIcon />
           </CloseButton>
@@ -482,18 +505,48 @@ const DashboardLayout = ({ children }) => {
             return (
               <NavItem 
                 key={item.key} 
-                active={isActive} 
-                collapsed={collapsed}
+                $active={isActive} 
+                $collapsed={collapsed}
                 onClick={() => handleMenuClick(item.key)}
               >
                 {item.icon}
-                <NavLabel collapsed={collapsed}>{item.label}</NavLabel>
+                <NavLabel $collapsed={collapsed}>{item.label}</NavLabel>
               </NavItem>
             );
           })}
+          
+          {user?.role_id === 1 && (
+            <>
+              <NavItem 
+                $active={location.pathname.startsWith('/settings')} 
+                $collapsed={collapsed}
+                onClick={() => setSettingsOpen(!settingsOpen)}
+                style={{ justifyContent: 'space-between' }}
+              >
+                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+                  <SettingsIcon />
+                  <NavLabel $collapsed={collapsed}>Settings</NavLabel>
+                </div>
+                {!collapsed && (
+                  settingsOpen ? <ExpandLessIcon style={{ fontSize: 18 }} /> : <ExpandMoreIcon style={{ fontSize: 18 }} />
+                )}
+              </NavItem>
+              
+              <SubMenuWrapper $isOpen={settingsOpen && !collapsed}>
+                <SubMenuItem 
+                  $active={location.pathname === '/settings/theme'} 
+                  $collapsed={collapsed}
+                  onClick={() => handleMenuClick('/settings/theme')}
+                >
+                  <PaletteIcon style={{ fontSize: 18 }} />
+                  <NavLabel $collapsed={collapsed}>Appearance</NavLabel>
+                </SubMenuItem>
+              </SubMenuWrapper>
+            </>
+          )}
         </NavList>
         
-        <SupportCard collapsed={collapsed}>
+        <SupportCard $collapsed={collapsed}>
           <SupportIconWrapper>
             <HelpOutlineIcon />
           </SupportIconWrapper>
@@ -503,7 +556,7 @@ const DashboardLayout = ({ children }) => {
         </SupportCard>
       </SidebarWrapper>
       
-      <MainContentWrapper collapsed={collapsed}>
+      <MainContentWrapper $collapsed={collapsed}>
         <HeaderWrapper>
           <HeaderLeft>
             <ToggleButton onClick={() => {

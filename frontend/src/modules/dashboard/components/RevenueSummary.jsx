@@ -134,7 +134,7 @@ const RevenueSummary = ({ totalInvoices = 0, pendingInvoices = 0 }) => {
             strokeColor="#10B981" 
             trailColor="#F1F5F9"
             showInfo={false} 
-            strokeWidth={8}
+            size={8}
           />
         </div>
 

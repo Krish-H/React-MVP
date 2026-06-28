@@ -152,25 +152,24 @@ const RecentActivity = () => {
     }
   ];
 
+  const timelineItems = activities.map(activity => ({
+    key: activity.id,
+    dot: (
+      <DotWrapper color={activity.color}>
+        {activity.icon}
+      </DotWrapper>
+    ),
+    children: (
+      <ActivityContent>
+        <ActivityText>{activity.content}</ActivityText>
+        <TimeText>{activity.time}</TimeText>
+      </ActivityContent>
+    )
+  }));
+
   return (
     <StyledCard title="Recent Activity">
-      <ActivityTimeline>
-        {activities.map(activity => (
-          <Timeline.Item 
-            key={activity.id} 
-            dot={
-              <DotWrapper color={activity.color}>
-                {activity.icon}
-              </DotWrapper>
-            }
-          >
-            <ActivityContent>
-              <ActivityText>{activity.content}</ActivityText>
-              <TimeText>{activity.time}</TimeText>
-            </ActivityContent>
-          </Timeline.Item>
-        ))}
-      </ActivityTimeline>
+      <ActivityTimeline items={timelineItems} />
     </StyledCard>
   );
 };

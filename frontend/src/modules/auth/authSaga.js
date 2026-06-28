@@ -17,10 +17,7 @@ import {
   changePasswordFailure,
   initializeAuthRequest,
   initializeAuthSuccess,
-  initializeAuthFailure,
-  registerRequest,
-  registerSuccess,
-  registerFailure
+  initializeAuthFailure
 } from './authSlice';
 
 // Worker Sagas
@@ -41,15 +38,6 @@ function* handleLogin(action) {
     yield put(loginSuccess({ user, accessToken: access_token }));
   } catch (error) {
     yield put(loginFailure(error.message));
-  }
-}
-
-function* handleRegister(action) {
-  try {
-    yield call(authAPI.registerUser, action.payload);
-    yield put(registerSuccess());
-  } catch (error) {
-    yield put(registerFailure(error.message));
   }
 }
 
@@ -104,14 +92,17 @@ function* handleChangePassword(action) {
 
 function* handleInitializeAuth() {
   try {
-    // Fetch CSRF token on app startup
-    try {
-      const csrfResponse = yield call(authAPI.getCsrfToken);
-      if (csrfResponse && csrfResponse.csrf_token) {
-        csrfService.setCsrfToken(csrfResponse.csrf_token);
+    // Fetch CSRF token on app startup only for subdomains
+    const hostname = window.location.hostname;
+    if (hostname !== 'localhost' && hostname !== '127.0.0.1') {
+      try {
+        const csrfResponse = yield call(authAPI.getCsrfToken);
+        if (csrfResponse && csrfResponse.csrf_token) {
+          csrfService.setCsrfToken(csrfResponse.csrf_token);
+        }
+      } catch (csrfError) {
+        console.warn('Failed to fetch CSRF token on init', csrfError);
       }
-    } catch (csrfError) {
-      console.warn('Failed to fetch CSRF token on init', csrfError);
     }
     
     const token = tokenService.getAccessToken();
@@ -136,7 +127,6 @@ export default function* authSaga() {
     takeLatest(refreshTokenRequest.type, handleRefreshToken),
     takeLatest(getProfileRequest.type, handleGetProfile),
     takeLatest(changePasswordRequest.type, handleChangePassword),
-    takeLatest(initializeAuthRequest.type, handleInitializeAuth),
-    takeLatest(registerRequest.type, handleRegister)
+    takeLatest(initializeAuthRequest.type, handleInitializeAuth)
   ]);
 }

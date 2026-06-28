@@ -7,6 +7,7 @@ import { useSelector } from 'react-redux';
 
 import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { selectAuthError } from '../../modules/auth/selectors';
+import { getTenantFromDomain } from '../../utils/tenant';
 import Button from '../../components/common/Button';
 import AuthLayout from './components/AuthLayout';
 import AuthHeader from './components/AuthHeader';
@@ -137,11 +138,17 @@ const LoginPage = () => {
     login({ email: values.email, password: values.password });
   };
 
+  const subdomain = getTenantFromDomain();
+
+  const subtitle = subdomain 
+    ? `Sign in to your ${subdomain.charAt(0).toUpperCase() + subdomain.slice(1)} workspace`
+    : "Sign in to continue to your healthcare dashboard";
+
   return (
     <AuthLayout>
       <AuthHeader
         title="Welcome Back"
-        subtitle="Sign in to continue to your healthcare dashboard"
+        subtitle={subtitle}
       />
 
       {error && (

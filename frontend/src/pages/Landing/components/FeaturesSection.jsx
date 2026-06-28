@@ -131,7 +131,7 @@ const FeaturesSection = () => {
         </Heading>
         <Grid>
           {features.map((feature) => (
-            <FeatureCard key={feature.title} bordered={false}>
+            <FeatureCard key={feature.title} variant="borderless">
               <IconWrap>{feature.icon}</IconWrap>
               <FeatureTitle>{feature.title}</FeatureTitle>
               <FeatureText>{feature.text}</FeatureText>

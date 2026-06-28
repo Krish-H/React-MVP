@@ -241,12 +241,12 @@ const DashboardPage = () => {
           <Grid stackable style={{ marginTop: '16px' }}>
             <Grid.Row>
               {/* Left Column: Recent Appointments */}
-              <Grid.Column width={10} mobile={16} tablet={16} computer={10}>
+              <Grid.Column mobile={16} tablet={16} computer={10}>
                 <AppointmentOverview appointments={recentAppointments} loading={loading} />
               </Grid.Column>
 
               {/* Right Column: Revenue & Activity Summaries */}
-              <Grid.Column width={6} mobile={16} tablet={16} computer={6}>
+              <Grid.Column mobile={16} tablet={16} computer={6}>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
                   <RevenueSummary 
                     totalInvoices={totalInvoices} 

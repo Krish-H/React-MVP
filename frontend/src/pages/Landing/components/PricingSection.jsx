@@ -1,6 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Check } from '@mui/icons-material';
+import { useNavigate } from 'react-router-dom';
 import Button from '../../../components/common/Button';
 import Card from '../../../components/common/Card';
 
@@ -129,6 +130,8 @@ const plans = [
 ];
 
 const PricingSection = () => {
+  const navigate = useNavigate();
+
   return (
     <Section id="pricing">
       <Container>
@@ -141,7 +144,7 @@ const PricingSection = () => {
         </Heading>
         <Grid>
           {plans.map((plan) => (
-            <PricingCard key={plan.name} bordered={false} style={plan.featured ? { border: `1px solid ${'#0052CC'}` } : undefined}>
+            <PricingCard key={plan.name} variant="borderless" style={plan.featured ? { border: `1px solid ${'#0052CC'}` } : undefined}>
               <PlanName>{plan.name}</PlanName>
               <Price>
                 <Amount>{plan.price}</Amount>
@@ -156,7 +159,10 @@ const PricingSection = () => {
                   </FeatureItem>
                 ))}
               </FeatureList>
-              <Button variant={plan.featured ? 'primary' : 'default'}>
+              <Button 
+                variant={plan.featured ? 'primary' : 'default'}
+                onClick={() => navigate(`/register?plan=${plan.name.toLowerCase()}`)}
+              >
                 Choose {plan.name}
               </Button>
             </PricingCard>

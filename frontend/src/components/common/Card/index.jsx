@@ -6,7 +6,7 @@ const StyledCard = styled(AntCard)`
   && {
     border-radius: ${({ theme }) => theme.radius.card};
     border-color: ${({ theme }) => theme.colors.neutral.divider};
-    box-shadow: ${({ theme, noShadow }) => (noShadow ? 'none' : theme.shadows.sm)};
+    box-shadow: ${({ theme, $noShadow }) => ($noShadow ? 'none' : theme.shadows.sm)};
     background: ${({ theme }) => theme.colors.neutral.surface};
     
     .ant-card-head {
@@ -30,7 +30,7 @@ const StyledCard = styled(AntCard)`
 
 const Card = ({ children, noShadow = false, ...props }) => {
   return (
-    <StyledCard noShadow={noShadow} {...props}>
+    <StyledCard $noShadow={noShadow} {...props}>
       {children}
     </StyledCard>
   );

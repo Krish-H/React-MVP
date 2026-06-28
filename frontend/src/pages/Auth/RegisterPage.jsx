@@ -7,11 +7,10 @@ import {
   MailOutlined,
   BankOutlined,
 } from '@ant-design/icons';
-import { Navigate, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
+import { Navigate, useNavigate, useLocation } from 'react-router-dom';
+import { useSelector, useDispatch } from 'react-redux';
 
-import { useAuth } from '../../modules/auth/hooks/useAuth';
-import { selectAuthError } from '../../modules/auth/selectors';
+import { registerRequest, resetRegisterState } from '../../modules/tenant/tenantSlice';
 import Button from '../../components/common/Button';
 import AuthLayout from './components/AuthLayout';
 import AuthHeader from './components/AuthHeader';
@@ -146,43 +145,69 @@ const LoginLink = styled.span`
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const RegisterPage = () => {
-  const { register, loading, isAuthenticated, registrationSuccess, resetRegistration } = useAuth();
-  const error = useSelector(selectAuthError);
+  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const [form] = Form.useForm();
   const [passwordValue, setPasswordValue] = useState('');
 
-  useEffect(() => {
-    return () => resetRegistration();
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  const { loading, error, registrationSuccess, tenantDetails } = useSelector((state) => state.tenant);
+  const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+
+  const queryParams = new URLSearchParams(location.search);
+  const plan = queryParams.get('plan') || 'basic';
 
   useEffect(() => {
-    if (registrationSuccess) {
-      navigate('/login', {
-        state: { message: 'Registration successful. Please sign in.' },
-      });
-    }
-  }, [registrationSuccess, navigate]);
+    return () => {
+      dispatch(resetRegisterState());
+    };
+  }, [dispatch]);
 
   if (isAuthenticated) {
     return <Navigate to="/dashboard" replace />;
   }
 
   const onFinish = (values) => {
-    register({
-      hospital_name: values.hospitalName,
+    dispatch(registerRequest({
+      company_name: values.companyName,
       name: values.name,
       email: values.email,
       password: values.password,
-    });
+      plan: plan
+    }));
   };
 
   const strength = getStrength(passwordValue);
 
+  if (registrationSuccess && tenantDetails) {
+    return (
+      <AuthLayout>
+        <AuthHeader
+          title="Your workspace is ready"
+          subtitle="Your organisation has been successfully registered."
+        />
+        <div style={{ textAlign: 'center', margin: '24px 0', padding: '16px', background: '#f5f5f5', borderRadius: '8px' }}>
+          <Text type="secondary">Hospital:</Text><br/>
+          <Text strong style={{ fontSize: '16px' }}>{form.getFieldValue('companyName')}</Text>
+          <br /><br />
+          <Text type="secondary">Workspace:</Text><br/>
+          <Text strong style={{ fontSize: '16px', color: '#0052CC' }}>{tenantDetails.tenant_url}</Text>
+        </div>
+        <Button
+          variant="primary"
+          style={{ width: '100%', height: '44px' }}
+          onClick={() => window.location.href = `${tenantDetails.tenant_url}/login`}
+        >
+          Continue to Workspace
+        </Button>
+      </AuthLayout>
+    );
+  }
+
   return (
     <AuthLayout>
       <AuthHeader
-        title="Create an Account"
+        title="Create Your Workspace"
         subtitle="Register your organisation on the healthcare platform"
       />
 
@@ -200,7 +225,7 @@ const RegisterPage = () => {
         {/* Row 1: Hospital name + Full name */}
         <div className="field-row">
           <Form.Item
-            name="hospitalName"
+            name="companyName"
             label="Hospital / Organisation"
             rules={[
               { required: true, message: 'Required.' },
@@ -232,23 +257,34 @@ const RegisterPage = () => {
           </Form.Item>
         </div>
 
-        {/* Row 2: Email — full width */}
-        <Form.Item
-          name="email"
-          label="Email Address"
-          rules={[
-            { required: true, message: 'Required.' },
-            { type: 'email', message: 'Enter a valid email.' },
-          ]}
-        >
-          <Input
-            prefix={<MailOutlined />}
-            placeholder="doctor@hospital.com"
-            size="middle"
-            disabled={loading}
-            autoComplete="email"
-          />
-        </Form.Item>
+        {/* Row 2: Email + Plan */}
+        <div className="field-row">
+          <Form.Item
+            name="email"
+            label="Email Address"
+            rules={[
+              { required: true, message: 'Required.' },
+              { type: 'email', message: 'Enter a valid email.' },
+            ]}
+          >
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="doctor@hospital.com"
+              size="middle"
+              disabled={loading}
+              autoComplete="email"
+            />
+          </Form.Item>
+
+          <Form.Item label="Plan">
+            <Input
+              size="middle"
+              value={plan.charAt(0).toUpperCase() + plan.slice(1)}
+              disabled
+              style={{ color: '#0052CC', fontWeight: 600, backgroundColor: '#f0f5ff', border: '1px solid #adc6ff' }}
+            />
+          </Form.Item>
+        </div>
 
         {/* Row 3: Password + Confirm password */}
         <div className="field-row">

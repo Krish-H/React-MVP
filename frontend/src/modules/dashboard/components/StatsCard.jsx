@@ -104,8 +104,8 @@ const TrendBadge = styled.span`
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
-  background-color: ${props => props.isUp ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${props => props.isUp ? '#10B981' : '#EF4444'};
+  background-color: ${props => props.$isUp ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
+  color: ${props => props.$isUp ? '#10B981' : '#EF4444'};
   
   svg {
     font-size: 14px;
@@ -126,7 +126,7 @@ const StatsCard = ({ title, value, icon, color = 'info', trend = '+12%', trendTy
         </IconWrapper>
       </TopRow>
       <TrendRow>
-        <TrendBadge isUp={isUp}>
+        <TrendBadge $isUp={isUp}>
           {isUp ? <TrendingUpIcon /> : <TrendingDownIcon />}
           {trend}
         </TrendBadge>
