@@ -16,6 +16,8 @@ const PatientDetails = lazy(() => import('../pages/Patients/PatientDetails'));
 const AddPatient = lazy(() => import('../pages/Patients/AddPatient'));
 const EditPatient = lazy(() => import('../pages/Patients/EditPatient'));
 const AppointmentList = lazy(() => import('../pages/Appointments/AppointmentList'));
+const CreateAppointment = lazy(() => import('../pages/Appointments/CreateAppointment'));
+const AppointmentDetails = lazy(() => import('../pages/Appointments/AppointmentDetails'));
 const InvoicePage = lazy(() => import('../pages/Billing/InvoicePage'));
 const StaffManagement = lazy(() => import('../pages/Staff/StaffManagement'));
 const ThemeSettings = lazy(() => import('../pages/Settings/ThemeSettings'));
@@ -62,6 +64,9 @@ const AppRouter = () => {
             <Route path="/patients/:id" element={<PatientDetails />} />
             <Route path="/patients/:id/edit" element={<EditPatient />} />
             <Route path="/appointments" element={<AppointmentList />} />
+            <Route path="/appointments/create" element={<CreateAppointment />} />
+            <Route path="/appointments/:id" element={<AppointmentDetails />} />
+            <Route path="/appointments/:id/edit" element={<AppointmentDetails />} />
           </Route>
 
           {/* Admin only routes */}

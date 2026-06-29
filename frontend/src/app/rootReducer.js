@@ -4,7 +4,7 @@ import dashboardReducer from '../modules/dashboard/dashboardSlice';
 import tenantReducer from '../modules/tenant/tenantSlice';
 import patientReducer from '../modules/patients/patientSlice';
 import staffReducer from '../modules/staff/staffSlice';
-
+import appointmentReducer from '../modules/appointment/appointmentSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -12,7 +12,7 @@ const rootReducer = combineReducers({
   tenant: tenantReducer,
   patients: patientReducer,
   staff: staffReducer,
-
+  appointments: appointmentReducer,
 });
 
 export default rootReducer;
