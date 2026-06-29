@@ -1,5 +1,5 @@
 import React from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { useNavigate } from 'react-router-dom';
 import AddIcon from '@mui/icons-material/Add';
 import Table from '../../../components/common/Table';
@@ -10,13 +10,13 @@ import EmptyState from '../../../components/common/EmptyState';
 const TableContainer = styled(Card)`
   && {
     border-radius: 18px;
-    border: 1px solid #E5E9F2;
-    box-shadow: 0 10px 20px rgba(10, 25, 47, 0.03);
-    background-color: #FFFFFF;
+    border: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    background-color: ${({ theme }) => theme.colors.neutral.surface || '#FFFFFF'};
     overflow: hidden;
 
     .ant-card-head {
-      border-bottom: 1px solid #E5E9F2;
+      border-bottom: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
       padding: 0 24px;
       min-height: 64px;
       display: flex;
@@ -26,7 +26,7 @@ const TableContainer = styled(Card)`
     .ant-card-head-title {
       font-size: 16px;
       font-weight: 700;
-      color: #0A192F;
+      color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
     }
 
     .ant-card-body {
@@ -78,18 +78,19 @@ const PatientCell = styled.div`
 
 const PatientName = styled.span`
   font-weight: 600;
-  color: #0A192F;
+  color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
   font-size: 14px;
 `;
 
 const PatientSub = styled.span`
   font-size: 12px;
-  color: #64748B;
+  color: ${({ theme }) => theme.colors.neutral.textSecondary || '#64748B'};
   margin-top: 2px;
 `;
 
 const AppointmentOverview = ({ appointments = [], loading = false }) => {
   const navigate = useNavigate();
+  const theme = useTheme();
 
   const handleCreateClick = () => {
     navigate('/appointments');
@@ -111,19 +112,19 @@ const AppointmentOverview = ({ appointments = [], loading = false }) => {
       title: 'Doctor',
       dataIndex: 'doctor_name',
       key: 'doctor_name',
-      render: (text) => <span style={{ color: '#0A192F', fontWeight: 500 }}>{text || 'Dr. Self'}</span>
+      render: (text) => <span style={{ color: theme?.colors?.neutral?.textPrimary || '#0A192F', fontWeight: 500 }}>{text || 'Dr. Self'}</span>
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-      render: (text) => <span style={{ color: '#64748B' }}>{text}</span>
+      render: (text) => <span style={{ color: theme?.colors?.neutral?.textSecondary || '#64748B' }}>{text}</span>
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      render: (text) => <span style={{ color: '#64748B' }}>{text}</span>
+      render: (text) => <span style={{ color: theme?.colors?.neutral?.textSecondary || '#64748B' }}>{text}</span>
     },
     {
       title: 'Status',

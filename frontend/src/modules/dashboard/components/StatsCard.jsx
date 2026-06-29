@@ -8,10 +8,10 @@ import Card from '../../../components/common/Card';
 const StyledCard = styled(Card)`
   && {
     border-radius: 18px;
-    border: 1px solid #E5E9F2;
-    box-shadow: 0 10px 20px rgba(10, 25, 47, 0.03);
+    border: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
+    box-shadow: ${({ theme }) => theme.shadows.md};
     transition: transform 0.22s ease-in-out, box-shadow 0.22s ease-in-out;
-    background-color: #FFFFFF;
+    background-color: ${({ theme }) => theme.colors.neutral.surface || '#FFFFFF'};
     
     .ant-card-body {
       padding: 24px;
@@ -22,8 +22,8 @@ const StyledCard = styled(Card)`
     
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 25px -5px rgba(10, 25, 47, 0.08), 0 10px 10px -5px rgba(10, 25, 47, 0.03);
-      border-color: rgba(37, 99, 235, 0.15);
+      box-shadow: ${({ theme }) => theme.shadows.lg};
+      border-color: ${({ theme }) => theme.colors.primary.main};
     }
   }
 `;
@@ -70,7 +70,7 @@ const ContentWrapper = styled.div`
   flex: 1;
   
   .ant-statistic-title {
-    color: #64748B;
+    color: ${({ theme }) => theme.colors.neutral.textSecondary || '#64748B'};
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 6px;
@@ -79,7 +79,7 @@ const ContentWrapper = styled.div`
   }
   
   .ant-statistic-content-value {
-    color: #0A192F;
+    color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
     font-size: 28px;
     font-weight: 700;
   }
@@ -91,8 +91,8 @@ const TrendRow = styled.div`
   gap: 6px;
   font-size: 12px;
   font-weight: 500;
-  color: #64748B;
-  border-top: 1px solid #F1F5F9;
+  color: ${({ theme }) => theme.colors.neutral.textSecondary || '#64748B'};
+  border-top: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#F1F5F9'};
   padding-top: 12px;
 `;
 
