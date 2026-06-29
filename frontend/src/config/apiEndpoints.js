@@ -11,6 +11,13 @@ export const apiEndpoints = {
     register: '/tenants/register',
     theme: '/tenants/theme',
   },
+  patients: {
+    list:   '/patients',
+    create: '/patients',
+    detail: (id) => `/patients/${id}`,
+    update: (id) => `/patients/${id}`,
+    delete: (id) => `/patients/${id}`,
+  },
   dashboard: '/dashboard',
   users: {
     base: '/users',
