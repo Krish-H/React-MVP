@@ -11,6 +11,7 @@ import { selectAuthInitialized } from './modules/auth/selectors';
 import { useIdleLogout } from './hooks/useIdleLogout';
 import { warmTheme } from './themes/warmTheme';
 import { createTenantTheme } from './themes/tenantTheme';
+import GlobalStyle from './themes/GlobalStyles';
 import { getTenantFromDomain } from './utils/tenant';
 import { fetchThemeRequest } from './modules/tenant/tenantSlice';
 
@@ -49,6 +50,7 @@ const ThemeWrapper = ({ children }) => {
 
   return (
     <ThemeProvider theme={activeTheme}>
+      <GlobalStyle />
       {children}
     </ThemeProvider>
   );

@@ -9,24 +9,25 @@ import EmptyState from '../../../components/common/EmptyState';
 
 const TableContainer = styled(Card)`
   && {
-    border-radius: 18px;
-    border: 1px solid #E5E9F2;
-    box-shadow: 0 10px 20px rgba(10, 25, 47, 0.03);
-    background-color: #FFFFFF;
+    border-radius: ${({ theme }) => theme.radius.card};
+    border: 1px solid ${({ theme }) => theme.colors.neutral.divider};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    background: ${({ theme }) => theme.colors.neutral.surface};
+    transition: ${({ theme }) => theme.transitions.normal};
     overflow: hidden;
 
     .ant-card-head {
-      border-bottom: 1px solid #E5E9F2;
-      padding: 0 24px;
+      border-bottom: 1px solid ${({ theme }) => theme.colors.neutral.divider};
+      padding: 0 ${({ theme }) => theme.spacing.lg};
       min-height: 64px;
       display: flex;
       align-items: center;
     }
     
     .ant-card-head-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #0A192F;
+      font-size: ${({ theme }) => theme.typography.sizes.h3};
+      font-weight: ${({ theme }) => theme.typography.weights.semibold};
+      color: ${({ theme }) => theme.colors.neutral.textPrimary};
     }
 
     .ant-card-body {
@@ -50,7 +51,7 @@ const StatusTag = styled.span`
   
   background-color: ${props => {
     switch (props.status?.toLowerCase()) {
-      case 'completed': return 'rgba(16, 185, 129, 0.1)';
+      case 'completed': return '${({ theme }) => theme.colors.semantic.success.background}';
       case 'scheduled':
       case 'processing': return 'rgba(37, 99, 235, 0.1)';
       case 'cancelled': return 'rgba(239, 68, 68, 0.1)';
@@ -61,7 +62,7 @@ const StatusTag = styled.span`
   
   color: ${props => {
     switch (props.status?.toLowerCase()) {
-      case 'completed': return '#10B981';
+      case 'completed': return '${({ theme }) => theme.colors.semantic.success.main}';
       case 'scheduled':
       case 'processing': return '#2563EB';
       case 'cancelled': return '#EF4444';
@@ -78,13 +79,13 @@ const PatientCell = styled.div`
 
 const PatientName = styled.span`
   font-weight: 600;
-  color: #0A192F;
+  color:${({ theme }) => theme.colors.neutral.textPrimary};
   font-size: 14px;
 `;
 
 const PatientSub = styled.span`
   font-size: 12px;
-  color: #64748B;
+  color:${({ theme }) => theme.colors.neutral.textSecondary};
   margin-top: 2px;
 `;
 
@@ -111,19 +112,19 @@ const AppointmentOverview = ({ appointments = [], loading = false }) => {
       title: 'Doctor',
       dataIndex: 'doctor_name',
       key: 'doctor_name',
-      render: (text) => <span style={{ color: '#0A192F', fontWeight: 500 }}>{text || 'Dr. Self'}</span>
+      render: (text) => <span style={{color:'inherit',fontWeight:500}}>{text || 'Dr. Self'}</span>
     },
     {
       title: 'Date',
       dataIndex: 'date',
       key: 'date',
-      render: (text) => <span style={{ color: '#64748B' }}>{text}</span>
+      render: (text) => <span style={{ color: 'inherit' }}>{text}</span>
     },
     {
       title: 'Time',
       dataIndex: 'time',
       key: 'time',
-      render: (text) => <span style={{ color: '#64748B' }}>{text}</span>
+      render: (text) => <span style={{ color: 'inherit' }}>{text}</span>
     },
     {
       title: 'Status',

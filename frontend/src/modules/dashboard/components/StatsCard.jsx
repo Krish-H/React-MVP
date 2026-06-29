@@ -8,10 +8,11 @@ import Card from '../../../components/common/Card';
 const StyledCard = styled(Card)`
   && {
     border-radius: 18px;
-    border: 1px solid #E5E9F2;
-    box-shadow: 0 10px 20px rgba(10, 25, 47, 0.03);
-    transition: transform 0.22s ease-in-out, box-shadow 0.22s ease-in-out;
-    background-color: #FFFFFF;
+    border: 1px solid ${({ theme }) => theme.colors.neutral.divider};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    background-color: ${({ theme }) => theme.colors.neutral.surface};
+    transition: ${({ theme }) => theme.transitions.normal};
+    
     
     .ant-card-body {
       padding: 24px;
@@ -22,8 +23,8 @@ const StyledCard = styled(Card)`
     
     &:hover {
       transform: translateY(-4px);
-      box-shadow: 0 20px 25px -5px rgba(10, 25, 47, 0.08), 0 10px 10px -5px rgba(10, 25, 47, 0.03);
-      border-color: rgba(37, 99, 235, 0.15);
+      box-shadow: ${({ theme }) => theme.shadows.lg};
+      border-color: ${({ theme }) => theme.colors.primary.main};
     }
   }
 `;
@@ -42,25 +43,39 @@ const IconWrapper = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: ${props => {
-    switch (props.color) {
-      case 'success': return 'rgba(16, 185, 129, 0.1)';
-      case 'primary': return 'rgba(37, 99, 235, 0.1)';
-      case 'warning': return 'rgba(245, 158, 11, 0.1)';
-      case 'info':
-      default: return 'rgba(59, 130, 246, 0.1)';
-    }
-  }};
-  color: ${props => {
-    switch (props.color) {
-      case 'success': return '#10B981';
-      case 'primary': return '#2563EB';
-      case 'warning': return '#F59E0B';
-      case 'info':
-      default: return '#3B82F6';
-    }
-  }};
+    background-color: ${({ theme, color }) => {
+  switch (color) {
+    case 'success':
+      return theme.colors.semantic.success.background;
+
+    case 'warning':
+      return theme.colors.semantic.warning.background;
+
+    case 'primary':
+      return theme.colors.primary.light;
+
+    case 'info':
+    default:
+      return theme.colors.semantic.info.background;
+  }
+}};
   
+  color: ${({ theme, color }) => {
+  switch (color) {
+    case 'success':
+      return theme.colors.semantic.success.main;
+
+    case 'warning':
+      return theme.colors.semantic.warning.main;
+
+    case 'primary':
+      return theme.colors.primary.main;
+
+    case 'info':
+    default:
+      return theme.colors.semantic.info.main;
+  }
+}};
   svg {
     font-size: 24px;
   }
@@ -70,7 +85,7 @@ const ContentWrapper = styled.div`
   flex: 1;
   
   .ant-statistic-title {
-    color: #64748B;
+    color:${({ theme }) => theme.colors.neutral.textSecondary};
     font-size: 13px;
     font-weight: 600;
     margin-bottom: 6px;
@@ -79,7 +94,7 @@ const ContentWrapper = styled.div`
   }
   
   .ant-statistic-content-value {
-    color: #0A192F;
+    color:${({ theme }) => theme.colors.neutral.textPrimary};
     font-size: 28px;
     font-weight: 700;
   }
@@ -91,8 +106,8 @@ const TrendRow = styled.div`
   gap: 6px;
   font-size: 12px;
   font-weight: 500;
-  color: #64748B;
-  border-top: 1px solid #F1F5F9;
+  color:${({ theme }) => theme.colors.neutral.textSecondary};
+  border-top:1px solid ${({ theme }) => theme.colors.neutral.divider};
   padding-top: 12px;
 `;
 
@@ -104,9 +119,14 @@ const TrendBadge = styled.span`
   border-radius: 6px;
   font-size: 11px;
   font-weight: 600;
-  background-color: ${props => props.$isUp ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)'};
-  color: ${props => props.$isUp ? '#10B981' : '#EF4444'};
-  
+  background-color:${({ theme,$isUp }) =>
+    $isUp
+        ? theme.colors.semantic.success.background
+        : theme.colors.semantic.error.background};
+  color:${({ theme,$isUp }) =>
+    $isUp
+        ? theme.colors.semantic.success.main
+        : theme.colors.semantic.error.main};
   svg {
     font-size: 14px;
   }

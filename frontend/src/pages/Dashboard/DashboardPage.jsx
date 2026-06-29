@@ -24,7 +24,7 @@ import RecentActivity from '../../modules/dashboard/components/RecentActivity';
 const DashboardGrid = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 32px;
+  gap:${({ theme }) => theme.spacing.xl};
 `;
 const HeroBanner = styled.div`
   display: flex;
@@ -33,17 +33,19 @@ const HeroBanner = styled.div`
   position: relative;
   overflow: hidden;
 
-  padding: 40px 50px;
+  padding: ${({ theme }) => theme.spacing.xxl}
+           ${({ theme }) => theme.spacing.xxxl};
+
   min-height: 280px;
 
-  border-radius: 24px;
+  border-radius: ${({ theme }) => theme.radius.card};
 
-  background: linear-gradient(
-    135deg,
-    #f8fbff 0%,
-    #eef5ff 60%,
-    #ffffff 100%
-  );
+  background: ${({ theme }) =>
+    theme.colors.primary.gradient};
+
+  box-shadow: ${({ theme }) => theme.shadows.lg};
+
+  transition: ${({ theme }) => theme.transitions.normal};
 
   &::before {
     content: "";
@@ -53,7 +55,8 @@ const HeroBanner = styled.div`
     right: -180px;
     top: -220px;
     border-radius: 50%;
-    background: rgba(37, 99, 235, 0.08);
+    background: ${({ theme }) => theme.colors.primary.light};
+    opacity: 0.15;
   }
 
   &::after {
@@ -64,13 +67,14 @@ const HeroBanner = styled.div`
     right: -250px;
     bottom: -170px;
     border-radius: 50%;
-    background: rgba(96, 165, 250, 0.15);
+    background: ${({ theme }) => theme.colors.primary.light};
+    opacity: 0.25;
   }
 
-  @media (max-width: 768px) {
+  @media (max-width:${({ theme }) => theme.breakpoints.tablet}) {
     flex-direction: column;
     text-align: center;
-    padding: 30px;
+    padding:${({ theme }) => theme.spacing.xl};
   }
 `;
 
@@ -81,15 +85,16 @@ const HeroContent = styled.div`
 `;
 
 const HeroTitle = styled.h1`
-  font-size: 40px;
-  font-weight: 700;
-  color: #0f172a;
+  font-size:${({ theme }) => theme.typography.sizes.h1};
+  font-family:${({ theme }) => theme.typography.family};
+  font-weight: ${({ theme }) => theme.typography.weights.bold};
+  color: white;
   margin-bottom: 15px;
 `;
 
 const HeroSubtitle = styled.p`
-  font-size: 17px;
-  color: #64748b;
+  font-size:${({ theme }) => theme.typography.sizes.body};
+  color:rgba(255,255,255,.9);
   line-height: 1.7;
 `;
 
@@ -112,12 +117,10 @@ const HeroIllustration = styled.img`
 
   /* This blends the image with the background */
   opacity: 0.95;
-
-  filter:
-    brightness(1.02)
-    contrast(1.02)
-    drop-shadow(0 15px 30px rgba(37,99,235,.15));
-  @media (max-width: 768px) {
+ 
+  filter: drop-shadow(0 20px 40px rgba(0,0,0,.15));
+  
+  @media (max-width: ${({ theme }) => theme.breakpoints.tablet}) {
     width: 280px;
   }
 `;
@@ -133,7 +136,11 @@ const GridWrapper = styled.div`
     padding: 0 1rem;
   }
 `;
-
+const RightColumn = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xl};
+`;
 const DashboardPage = () => {
   const { user } = useAuth();
   const { metrics, loading, error, fetchDashboard } = useDashboard();
@@ -238,7 +245,7 @@ const DashboardPage = () => {
           </Grid>
 
           {/* Two-Column Responsive Content Grid */}
-          <Grid stackable style={{ marginTop: '16px' }}>
+          <Grid stackable style={{ marginTop: 'var(--dashboard-spacing)' }}>
             <Grid.Row>
               {/* Left Column: Recent Appointments */}
               <Grid.Column mobile={16} tablet={16} computer={10}>
@@ -247,13 +254,13 @@ const DashboardPage = () => {
 
               {/* Right Column: Revenue & Activity Summaries */}
               <Grid.Column mobile={16} tablet={16} computer={6}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '32px' }}>
+                <RightColumn>
                   <RevenueSummary 
                     totalInvoices={totalInvoices} 
                     pendingInvoices={pendingInvoices} 
                   />
                   <RecentActivity />
-                </div>
+                </RightColumn>
               </Grid.Column>
             </Grid.Row>
           </Grid>

@@ -1,16 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import styled, { ThemeProvider } from 'styled-components';
-import { useDispatch, useSelector } from 'react-redux';
-import { Radio, Select, Button, Typography, message, Spin } from 'antd';
-import { 
-  updateLocalThemeConfig, 
-  updateThemeRequest, 
-  fetchThemeRequest 
-} from '../../modules/tenant/tenantSlice';
+import { Radio, Select, Button, Typography, message} from 'antd';
+import { useTenantTheme } from '../../modules/tenant/hooks/useTenantTheme';
 import Card from '../../components/common/Card';
 import Loader from '../../components/common/Loader';
 import { createTenantTheme } from '../../themes/tenantTheme';
-import { warmTheme } from '../../themes/warmTheme';
+
 
 const { Title, Text } = Typography;
 
@@ -52,7 +47,7 @@ const Label = styled(Text)`
     display: block;
     margin-bottom: 8px;
     font-weight: 600;
-    color: ${({ theme }) => theme.colors?.text?.primary || '#0A192F'};
+    color: ${({ theme }) => theme.colors.neutral.textPrimary};
   }
 `;
 
@@ -83,52 +78,58 @@ const NativeColorInput = styled.input`
 const HexInput = styled.input`
   height: 40px;
   padding: 8px 12px;
-  border: 1px solid #E2E8F0;
-  border-radius: 8px;
+  border: 1px solid ${({ theme }) => theme.colors.neutral.border};border: 1px solid ${({ theme }) => theme.colors.neutral.border};
+  border-radius: ${({ theme }) => theme.radius.medium};
   font-family: monospace;
   outline: none;
   width: 100px;
 
   &:focus {
-    border-color: #2563EB;
+    border-color: ${({ theme }) => theme.colors.primary.main};
   }
 `;
 
 const LivePreviewCard = styled.div`
-  background-color: ${({ theme }) => theme.colors?.background || '#FFFFFF'};
-  border-radius: ${({ theme }) => theme.borderRadius || '8px'};
+  background-color: ${({ theme }) => theme.colors.neutral.surface};
+  border-radius: ${({ theme }) => theme.radius.card};
   padding: 24px;
-  border: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E5E9F2'};
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
-  font-family: ${({ theme }) => theme.fontFamily || 'Inter'};
-  color: ${({ theme }) => theme.colors?.text?.primary || '#0A192F'};
+  border: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
+  box-shadow: ${({ theme }) => theme.shadows.md};
+  font-family: ${({ theme }) => theme.typography.family};
+  color: ${({ theme }) => theme.colors.neutral.textPrimary};
 `;
 
 const PreviewButton = styled.button`
-  background-color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
+  background-color: ${({ theme }) => theme.colors.primary.main || '#2563EB'};
   color: #FFFFFF;
   border: none;
-  border-radius: ${({ theme }) => theme.borderRadius || '8px'};
+  border-radius: ${({ theme }) => theme.radius.button};
   padding: 10px 20px;
-  font-family: ${({ theme }) => theme.fontFamily || 'Inter'};
+  font-family: ${({ theme }) => theme.typography.family};
   font-weight: 600;
   cursor: pointer;
   margin-top: 16px;
 
   &:hover {
-    opacity: 0.9;
+    background: ${({ theme }) => theme.colors.primary.hover};
   }
 `;
 
 const PreviewSecondaryButton = styled(PreviewButton)`
-  background-color: ${({ theme }) => theme.colors?.secondary?.main || '#22C55E'};
+  background-color: ${({ theme }) =>
+  theme.colors.secondary.main || '#22C55E'};
   margin-left: 12px;
 `;
 
 const ThemeSettings = () => {
-  const dispatch = useDispatch();
-  const { themeConfig, themeLoading, themeSaving, themeUpdateError } = useSelector(state => state.tenant);
-  
+  const {
+  themeConfig,
+  themeLoading,
+  themeSaving,
+  themeUpdateError,
+  updateTheme,
+  saveTheme,
+  } = useTenantTheme();
   const [formData, setFormData] = useState({
     mode: 'warm',
     primaryColor: '#2563EB',
@@ -140,30 +141,27 @@ const ThemeSettings = () => {
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Only dispatch fetch if we don't have it yet to prevent loop
-    if (!themeConfig && !isInitialized) {
-      dispatch(fetchThemeRequest());
-      setIsInitialized(true);
-    } else if (themeConfig) {
-      setFormData({
-        mode: themeConfig.mode || 'warm',
-        primaryColor: themeConfig.primaryColor || '#2563EB',
-        secondaryColor: themeConfig.secondaryColor || '#22C55E',
-        fontFamily: themeConfig.fontFamily || 'Inter',
-        borderRadius: themeConfig.borderRadius || '8px'
-      });
-      setIsInitialized(true);
-    }
-  }, [dispatch, themeConfig, isInitialized]);
+  if (!themeConfig) return;
+
+  setFormData({
+    mode: themeConfig.mode || 'warm',
+    primaryColor: themeConfig.primaryColor || '#2563EB',
+    secondaryColor: themeConfig.secondaryColor || '#22C55E',
+    fontFamily: themeConfig.fontFamily || 'Inter',
+    borderRadius: themeConfig.borderRadius || '8px',
+  });
+
+  setIsInitialized(true);
+  }, [themeConfig]);
 
   const handleChange = (key, value) => {
     const updatedData = { ...formData, [key]: value };
     setFormData(updatedData);
-    dispatch(updateLocalThemeConfig(updatedData));
+    updateTheme(updatedData);
   };
 
   const handleSave = () => {
-    dispatch(updateThemeRequest(formData));
+    saveTheme(formData);
   };
 
   useEffect(() => {
@@ -271,8 +269,8 @@ const ThemeSettings = () => {
           <Card title="Live Preview">
             <ThemeProvider theme={previewTheme}>
               <LivePreviewCard>
-                <Title level={4} style={{ margin: 0, fontFamily: previewTheme.fontFamily }}>Sample Widget</Title>
-                <p style={{ margin: '16px 0', color: previewTheme.colors?.text?.secondary }}>
+                <Title level={4} style={{ margin: 0, fontFamily:previewTheme.typography.family, color:previewTheme.colors.neutral.textPrimary }}>Sample Widget</Title>
+                <p style={{ margin: '16px 0', color: previewTheme.colors.neutral.textSecondary }}>
                   This is how your components will look with the current theme settings. Notice how the background, fonts, and border radius dynamically adjust!
                 </p>
                 <PreviewButton>Primary Action</PreviewButton>
