@@ -6,7 +6,7 @@ import tenantSaga from '../modules/tenant/tenantSaga';
 import patientSaga from '../modules/patients/patientSaga';
 
 import staffSaga from '../modules/staff/staffSaga';
-
+import prescriptionSaga from '../modules/prescription/prescriptionSaga';
 export default function* rootSaga() {
   yield all([
     authSaga(),
@@ -14,5 +14,6 @@ export default function* rootSaga() {
     tenantSaga(),
     patientSaga(),
     staffSaga(),
+    prescriptionSaga(),
   ]);
 }

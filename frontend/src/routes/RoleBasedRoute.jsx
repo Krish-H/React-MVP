@@ -6,7 +6,8 @@ const ROLE_MAP = {
   'admin': 1,
   'doctor': 2,
   'nurse': 3,
-  'receptionist': 4
+  'receptionist': 4,
+  'pharmacist': 5,
 };
 
 const RoleBasedRoute = ({ allowedRoles }) => {

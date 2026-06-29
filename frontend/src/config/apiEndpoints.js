@@ -12,7 +12,7 @@ export const apiEndpoints = {
     theme: '/tenants/theme',
   },
   patients: {
-    list:   '/patients',
+    list: '/patients',
     create: '/patients',
     detail: (id) => `/patients/${id}`,
     update: (id) => `/patients/${id}`,
@@ -26,5 +26,17 @@ export const apiEndpoints = {
     base: '/staff',
     activate: (id) => `/staff/${id}/activate`,
     deactivate: (id) => `/staff/${id}/deactivate`,
-  }
+  },
+   prescriptions: {
+    list: '/prescriptions',
+    create: '/prescriptions',
+    detail: (id) => `/prescriptions/${id}`,
+    update: (id) => `/prescriptions/${id}`,
+    addItem: (id) => `/prescriptions/${id}/items`,
+    updateItem: (id, itemId) =>
+      `/prescriptions/${id}/items/${itemId}`,
+    deleteItem: (id, itemId) =>
+      `/prescriptions/${id}/items/${itemId}`,
+    updateStatus: (id) => `/prescriptions/${id}/status`,
+  },
 };
