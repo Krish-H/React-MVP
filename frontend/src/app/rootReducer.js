@@ -3,6 +3,7 @@ import authReducer from '../modules/auth/authSlice';
 import dashboardReducer from '../modules/dashboard/dashboardSlice';
 import tenantReducer from '../modules/tenant/tenantSlice';
 import patientReducer from '../modules/patients/patientSlice';
+import patientReducer from '../modules/patients/patientSlice';
 import staffReducer from '../modules/staff/staffSlice';
 
 

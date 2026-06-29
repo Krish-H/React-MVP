@@ -452,7 +452,7 @@ const DashboardLayout = ({ children }) => {
 
   const menuItems = [
     { key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
-    { key: '/patients', icon: <PeopleIcon />, label: 'Patients' },
+    ...(user?.role_id === 2 || user?.role_id === 3 ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
     { key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' },
     { key: '/billing', icon: <ReceiptIcon />, label: 'Billing' },
     ...(user?.role_id === 1 ? [{ key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' }] : []),
