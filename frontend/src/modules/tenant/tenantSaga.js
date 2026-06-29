@@ -27,7 +27,7 @@ function* handleRegister(action) {
 function* handleFetchTheme() {
   try {
     const response = yield call(tenantAPI.getTenantTheme);
-    yield put(fetchThemeSuccess(response.theme_config));
+    yield put(fetchThemeSuccess(response.theme));
   } catch (error) {
     yield put(fetchThemeFailure(error.message || 'Failed to fetch theme'));
   }
@@ -36,7 +36,7 @@ function* handleFetchTheme() {
 function* handleUpdateTheme(action) {
   try {
     const response = yield call(tenantAPI.updateTenantTheme, { theme: action.payload });
-    yield put(updateThemeSuccess(response.theme_config || action.payload));
+    yield put(updateThemeSuccess(response.theme || action.payload));
   } catch (error) {
     yield put(updateThemeFailure(error.message || 'Failed to update theme'));
   }

@@ -8,12 +8,12 @@ const { Text } = Typography;
 const StyledCard = styled(Card)`
   && {
     border-radius: 18px;
-    border: 1px solid #E5E9F2;
-    box-shadow: 0 10px 20px rgba(10, 25, 47, 0.03);
-    background-color: #FFFFFF;
+    border: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    background-color: ${({ theme }) => theme.colors.neutral.surface || '#FFFFFF'};
 
     .ant-card-head {
-      border-bottom: 1px solid #E5E9F2;
+      border-bottom: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
       padding: 0 24px;
       min-height: 64px;
       display: flex;
@@ -23,7 +23,7 @@ const StyledCard = styled(Card)`
     .ant-card-head-title {
       font-size: 16px;
       font-weight: 700;
-      color: #0A192F;
+      color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
     }
 
     .ant-card-body {
@@ -47,7 +47,7 @@ const RevenueHeader = styled.div`
 const RevenueValue = styled.div`
   font-size: 32px;
   font-weight: 800;
-  color: #2563EB;
+  color: ${({ theme }) => theme.colors.primary.main || '#2563EB'};
   letter-spacing: -0.5px;
 `;
 
@@ -60,7 +60,7 @@ const MetricRow = styled.div`
 
 const CollectionRateTitle = styled(Text)`
   && {
-    color: #64748B;
+    color: ${({ theme }) => theme.colors.neutral.textSecondary || '#64748B'};
     font-size: 13px;
     font-weight: 600;
   }
@@ -68,7 +68,7 @@ const CollectionRateTitle = styled(Text)`
 
 const CollectionRateVal = styled(Text)`
   && {
-    color: #0A192F;
+    color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
     font-weight: 700;
     font-size: 14px;
   }
@@ -78,7 +78,7 @@ const GridRow = styled.div`
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 16px;
-  border-top: 1px solid #F1F5F9;
+  border-top: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#F1F5F9'};
   padding-top: 20px;
 `;
 
@@ -88,14 +88,14 @@ const GridCol = styled.div`
   gap: 4px;
   
   &:first-child {
-    border-right: 1px solid #F1F5F9;
+    border-right: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#F1F5F9'};
     padding-right: 16px;
   }
 `;
 
 const ColLabel = styled(Text)`
   && {
-    color: #64748B;
+    color: ${({ theme }) => theme.colors.neutral.textSecondary || '#64748B'};
     font-size: 12px;
     font-weight: 500;
   }
@@ -105,7 +105,7 @@ const ColValue = styled(Text)`
   && {
     font-size: 20px;
     font-weight: 700;
-    color: ${props => props.color || '#0A192F'};
+    color: ${(props) => props.color || props.theme.colors.neutral.textPrimary};
   }
 `;
 
