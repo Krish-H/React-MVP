@@ -7,6 +7,15 @@ import { apiService } from '../../services/apiService';
 
 const { TextArea } = Input;
 
+const normalizeArray = (res, key) => {
+  return (
+    res?.[key] ||
+    res?.data?.[key] ||
+    res?.data ||
+    res ||
+    []
+  );
+};
 const CreatePrescription = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
@@ -35,16 +44,7 @@ const CreatePrescription = () => {
   const loadProviders = async () => {
     try {
       const res = await apiService.get('/users');
-      const users =
-      Array.isArray(res)
-        ? res
-        : Array.isArray(res?.users)
-        ? res.users
-        : Array.isArray(res?.data)
-        ? res.data
-        : Array.isArray(res?.data?.users)
-        ? res.data.users
-        : [];
+     const users = normalizeArray(res, 'users');
       console.log('USERS API RESPONSE:', users);
 
     const providers = users.filter(
