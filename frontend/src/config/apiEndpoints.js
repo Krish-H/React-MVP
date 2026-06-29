@@ -12,5 +12,12 @@ export const apiEndpoints = {
     theme: '/tenants/theme',
   },
   dashboard: '/dashboard',
-  // Other module endpoints...
+  users: {
+    base: '/users',
+  },
+  staff: {
+    base: '/staff',
+    activate: (id) => `/staff/${id}/activate`,
+    deactivate: (id) => `/staff/${id}/deactivate`,
+  }
 };
