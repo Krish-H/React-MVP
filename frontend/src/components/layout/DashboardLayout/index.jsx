@@ -455,7 +455,7 @@ const DashboardLayout = ({ children }) => {
     { key: '/patients', icon: <PeopleIcon />, label: 'Patients' },
     { key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' },
     { key: '/billing', icon: <ReceiptIcon />, label: 'Billing' },
-    { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' },
+    ...(user?.role_id === 1 ? [{ key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' }] : []),
   ];
 
   const handleMenuClick = (key) => {
