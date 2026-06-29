@@ -8,6 +8,8 @@ import EditIcon from '@mui/icons-material/Edit';
 import CancelIcon from '@mui/icons-material/Cancel';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useAppointments } from '../../modules/appointment/hooks/useAppointments';
+import { usePatients } from '../../modules/patients/hooks/usePatients';
+import { useStaff } from '../../modules/staff/hooks/useStaff';
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
@@ -75,11 +77,26 @@ const AppointmentList = () => {
     cancelAppointment,
     cancelling, cancelSuccess, cancelError, resetCancel,
   } = useAppointments();
+  const { list: patientList, fetchPatients } = usePatients();
+  const { users, fetchUsers } = useStaff();
 
   useEffect(() => {
     fetchAppointments();
+    fetchPatients();
+    fetchUsers({ role_id: 2 });
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  // Build lookup maps: id → name
+  const patientMap = (patientList || []).reduce((acc, p) => {
+    acc[p.id] = p.name || `Patient #${p.id}`;
+    return acc;
+  }, {});
+
+  const providerMap = (users || []).reduce((acc, u) => {
+    acc[u.id] = u.name || `Provider #${u.id}`;
+    return acc;
+  }, {});
 
   useEffect(() => {
     if (cancelSuccess) {
@@ -106,8 +123,8 @@ const AppointmentList = () => {
         <span style={{ fontWeight: 600, color: '#2563EB', fontFamily: 'monospace' }}>APT-{id}</span>
       ),
     },
-    { title: 'Patient',  dataIndex: 'patient_id',  key: 'patient_id',  render: (v) => `Patient #${v}` },
-    { title: 'Provider', dataIndex: 'provider_id', key: 'provider_id', render: (v) => `Provider #${v}` },
+    { title: 'Patient',  dataIndex: 'patient_id',  key: 'patient_id',  render: (v) => patientMap[v]  || `Patient #${v}`  },
+    { title: 'Provider', dataIndex: 'provider_id', key: 'provider_id', render: (v) => providerMap[v] || `Provider #${v}` },
     { title: 'Date',     dataIndex: 'appointment_date', key: 'appointment_date' },
     { title: 'Time',     dataIndex: 'appointment_time', key: 'appointment_time' },
     {

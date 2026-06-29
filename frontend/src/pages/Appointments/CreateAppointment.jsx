@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Form, Input, InputNumber, DatePicker, TimePicker, Button, Select, message } from 'antd';
+import { Form, Input, DatePicker, TimePicker, Button, Select, message } from 'antd';
 import styled from 'styled-components';
 import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EventIcon from '@mui/icons-material/Event';
@@ -9,6 +9,7 @@ import CancelIcon from '@mui/icons-material/Cancel';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useAppointments } from '../../modules/appointment/hooks/useAppointments';
 import { useStaff } from '../../modules/staff/hooks/useStaff';
+import { usePatients } from '../../modules/patients/hooks/usePatients';
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
@@ -105,16 +106,21 @@ const CreateAppointment = () => {
   const [form] = Form.useForm();
   const { createAppointment, submitting, submitSuccess, submitError, resetSubmit } = useAppointments();
   const { users, loading: staffLoading, fetchUsers } = useStaff();
+  const { list: patientList, listLoading: patientLoading, fetchPatients } = usePatients();
 
-  // Fetch providers (role_id=2) on mount
+  // Fetch providers and patients on mount
   useEffect(() => {
     fetchUsers({ role_id: 2 });
+    fetchPatients();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const providerOptions = (users || [])
     .filter(u => Number(u.role_id) === 2)
     .map(u => ({ label: u.name, value: u.id }));
+
+  const patientOptions = (patientList || [])
+    .map(p => ({ label: p.name, value: p.id }));
 
   useEffect(() => {
     if (submitSuccess) {
@@ -157,10 +163,18 @@ const CreateAppointment = () => {
             <FormGrid>
               <Form.Item
                 name="patient_id"
-                label="Patient ID"
+                label="Patient"
                 rules={[{ required: true, message: 'Patient is required' }]}
               >
-                <InputNumber style={{ width: '100%' }} placeholder="e.g. 1" min={1} />
+                <Select
+                  placeholder="Select a patient"
+                  options={patientOptions}
+                  loading={patientLoading}
+                  showSearch
+                  filterOption={(input, option) =>
+                    option.label.toLowerCase().includes(input.toLowerCase())
+                  }
+                />
               </Form.Item>
 
               <Form.Item
