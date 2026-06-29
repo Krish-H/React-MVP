@@ -2,6 +2,7 @@ import React, { useEffect } from 'react';
 import { BrowserRouter } from 'react-router-dom';
 import { Provider, useDispatch, useSelector } from 'react-redux';
 import { ThemeProvider } from 'styled-components';
+import { ConfigProvider, theme as antdTheme } from 'antd';
 import { store } from './app/store';
 import AppRouter from './routes/AppRouter';
 import ErrorBoundary from './components/common/ErrorBoundary';
@@ -13,6 +14,7 @@ import { warmTheme } from './themes/warmTheme';
 import { createTenantTheme } from './themes/tenantTheme';
 import { getTenantFromDomain } from './utils/tenant';
 import { fetchThemeRequest } from './modules/tenant/tenantSlice';
+import GlobalStyles from './themes/GlobalStyles';
 
 const AppInitializer = () => {
   const dispatch = useDispatch();
@@ -46,10 +48,17 @@ const ThemeWrapper = ({ children }) => {
   }, [dispatch, tenantName, themeConfig]);
 
   const activeTheme = tenantName && themeConfig ? createTenantTheme(themeConfig) : warmTheme;
+  const isDarkMode = themeConfig?.mode === 'dark';
 
   return (
     <ThemeProvider theme={activeTheme}>
-      {children}
+      <GlobalStyles />
+      <ConfigProvider theme={{ 
+        token: activeTheme.antd,
+        algorithm: isDarkMode ? antdTheme.darkAlgorithm : antdTheme.defaultAlgorithm
+      }}>
+        {children}
+      </ConfigProvider>
     </ThemeProvider>
   );
 };

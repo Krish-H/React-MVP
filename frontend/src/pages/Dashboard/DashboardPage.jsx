@@ -38,12 +38,9 @@ const HeroBanner = styled.div`
 
   border-radius: 24px;
 
-  background: linear-gradient(
-    135deg,
-    #f8fbff 0%,
-    #eef5ff 60%,
-    #ffffff 100%
-  );
+  background: ${({ theme }) => theme.mode === 'dark' 
+    ? '#000000' 
+    : 'linear-gradient(135deg, #f8fbff 0%, #eef5ff 60%, #ffffff 100%)'};
 
   &::before {
     content: "";
@@ -83,13 +80,13 @@ const HeroContent = styled.div`
 const HeroTitle = styled.h1`
   font-size: 40px;
   font-weight: 700;
-  color: #0f172a;
+  color: ${({ theme }) => theme.colors?.neutral?.textPrimary || '#0f172a'};
   margin-bottom: 15px;
 `;
 
 const HeroSubtitle = styled.p`
   font-size: 17px;
-  color: #64748b;
+  color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#64748b'};
   line-height: 1.7;
 `;
 

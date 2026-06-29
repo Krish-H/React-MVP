@@ -66,6 +66,9 @@ const tenantSlice = createSlice({
     },
     updateLocalThemeConfig: (state, action) => {
       state.themeConfig = { ...state.themeConfig, ...action.payload };
+    },
+    clearThemeConfig: (state) => {
+      state.themeConfig = null;
     }
   }
 });
@@ -81,7 +84,8 @@ export const {
   updateThemeRequest,
   updateThemeSuccess,
   updateThemeFailure,
-  updateLocalThemeConfig
+  updateLocalThemeConfig,
+  clearThemeConfig
 } = tenantSlice.actions;
 
 export default tenantSlice.reducer;

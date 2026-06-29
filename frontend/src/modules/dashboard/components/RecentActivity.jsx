@@ -13,12 +13,12 @@ const { Text } = Typography;
 const StyledCard = styled(Card)`
   && {
     border-radius: 18px;
-    border: 1px solid #E5E9F2;
-    box-shadow: 0 10px 20px rgba(10, 25, 47, 0.03);
-    background-color: #FFFFFF;
+    border: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
+    box-shadow: ${({ theme }) => theme.shadows.md};
+    background-color: ${({ theme }) => theme.colors.neutral.surface || '#FFFFFF'};
 
     .ant-card-head {
-      border-bottom: 1px solid #E5E9F2;
+      border-bottom: 1px solid ${({ theme }) => theme.colors.neutral.divider || '#E5E9F2'};
       padding: 0 24px;
       min-height: 64px;
       display: flex;
@@ -28,7 +28,7 @@ const StyledCard = styled(Card)`
     .ant-card-head-title {
       font-size: 16px;
       font-weight: 700;
-      color: #0A192F;
+      color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
     }
 
     .ant-card-body {
@@ -43,7 +43,7 @@ const ActivityTimeline = styled(Timeline)`
     padding-left: 4px;
     
     .ant-timeline-item-tail {
-      border-left: 2px dashed #E2E8F0;
+      border-left: 2px dashed ${({ theme }) => theme.colors.neutral.divider || '#E2E8F0'};
       top: 32px;
       left: 15px;
       height: calc(100% - 32px);
@@ -86,8 +86,8 @@ const DotWrapper = styled.div`
       default: return '#2563EB';
     }
   }};
-  border: 2px solid #FFFFFF;
-  box-shadow: 0 2px 8px rgba(10, 25, 47, 0.08);
+  border: 2px solid ${({ theme }) => theme.colors.neutral.surface || '#FFFFFF'};
+  box-shadow: ${({ theme }) => theme.shadows.sm};
   
   svg {
     font-size: 16px;
@@ -102,7 +102,7 @@ const ActivityContent = styled.div`
 
 const ActivityText = styled(Text)`
   && {
-    color: #0A192F;
+    color: ${({ theme }) => theme.colors.neutral.textPrimary || '#0A192F'};
     font-size: 13px;
     font-weight: 500;
     line-height: 1.4;
@@ -112,7 +112,7 @@ const ActivityText = styled(Text)`
 const TimeText = styled(Text)`
   && {
     font-size: 11px;
-    color: #94A3B8;
+    color: ${({ theme }) => theme.colors.neutral.textSecondary || '#94A3B8'};
   }
 `;
 
