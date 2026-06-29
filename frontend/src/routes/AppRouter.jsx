@@ -12,6 +12,9 @@ const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 const DashboardPage = lazy(() => import('../pages/Dashboard/DashboardPage'));
 const LandingPage = lazy(() => import('../pages/Landing/LandingPage'));
 const PatientList = lazy(() => import('../pages/Patients/PatientList'));
+const PatientDetails = lazy(() => import('../pages/Patients/PatientDetails'));
+const AddPatient = lazy(() => import('../pages/Patients/AddPatient'));
+const EditPatient = lazy(() => import('../pages/Patients/EditPatient'));
 const AppointmentList = lazy(() => import('../pages/Appointments/AppointmentList'));
 const InvoicePage = lazy(() => import('../pages/Billing/InvoicePage'));
 const StaffManagement = lazy(() => import('../pages/Staff/StaffManagement'));
@@ -55,6 +58,9 @@ const AppRouter = () => {
           {/* Patients and Appointments available to Admin, Doctor, Nurse */}
           <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse']} />}>
             <Route path="/patients" element={<PatientList />} />
+            <Route path="/patients/add" element={<AddPatient />} />
+            <Route path="/patients/:id" element={<PatientDetails />} />
+            <Route path="/patients/:id/edit" element={<EditPatient />} />
             <Route path="/appointments" element={<AppointmentList />} />
           </Route>
 
