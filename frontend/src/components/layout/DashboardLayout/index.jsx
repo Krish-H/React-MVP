@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
+import styled, { useTheme } from 'styled-components';
 import { Badge, Avatar, Dropdown } from 'antd';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../../../modules/auth/hooks/useAuth';
@@ -26,8 +26,8 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 const LayoutContainer = styled.div`
   display: flex;
   min-height: 100vh;
-  background-color: #F5F7FB;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+  background-color: ${({ theme }) => theme.colors?.neutral?.background || '#F5F7FB'};
+  font-family: ${({ theme }) => theme.typography?.family || "'Inter', -apple-system, BlinkMacSystemFont, sans-serif"};
 `;
 
 const SidebarWrapper = styled.aside`
@@ -36,8 +36,8 @@ const SidebarWrapper = styled.aside`
   left: 0;
   bottom: 0;
   width: ${props => props.$collapsed ? '80px' : '260px'};
-  background-color: #FFFFFF;
-  border-right: 1px solid #E5E9F2;
+  background-color: ${({ theme }) => theme.colors?.neutral?.surface || '#FFFFFF'};
+  border-right: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E5E9F2'};
   display: flex;
   flex-direction: column;
   transition: width 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
@@ -75,7 +75,7 @@ const MainContentWrapper = styled.div`
   display: flex;
   flex-direction: column;
   transition: margin-left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
-  background-color: #F5F7FB;
+  background-color: ${({ theme }) => theme.colors?.neutral?.background || '#F5F7FB'};
 
   @media (max-width: 768px) {
     margin-left: 0;
@@ -86,8 +86,8 @@ const HeaderWrapper = styled.header`
   position: sticky;
   top: 0;
   height: 70px;
-  background-color: #FFFFFF;
-  border-bottom: 1px solid #E5E9F2;
+  background-color: ${({ theme }) => theme.colors?.neutral?.surface || '#FFFFFF'};
+  border-bottom: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E5E9F2'};
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -102,10 +102,10 @@ const LogoArea = styled.div`
   align-items: center;
   padding: 0 24px;
   gap: 12px;
-  border-bottom: 1px solid #E5E9F2;
+  border-bottom: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E5E9F2'};
   font-weight: 700;
   font-size: 18px;
-  color: #2563EB;
+  color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
   white-space: nowrap;
   overflow: hidden;
   justify-content: ${props => props.$collapsed ? 'center' : 'flex-start'};
@@ -116,7 +116,7 @@ const LogoText = styled.span`
   font-weight: 800;
   font-size: 20px;
   letter-spacing: -0.5px;
-  color: #0A192F;
+  color: ${({ theme }) => theme.colors?.neutral?.textPrimary || '#0A192F'};
   
   @media (max-width: 768px) {
     display: inline;
@@ -137,8 +137,8 @@ const NavItem = styled.div`
   padding: 12px 16px;
   border-radius: 12px;
   cursor: pointer;
-  color: ${props => props.$active ? '#2563EB' : '#64748B'};
-  background-color: ${props => props.$active ? 'rgba(37, 99, 235, 0.06)' : 'transparent'};
+  color: ${({ $active, theme }) => $active ? (theme.colors?.primary?.main || '#2563EB') : (theme.colors?.neutral?.textSecondary || '#64748B')};
+  background-color: ${({ $active, theme }) => $active ? (theme.colors?.primary?.light || 'rgba(37, 99, 235, 0.06)') : 'transparent'};
   font-weight: ${props => props.$active ? '600' : '500'};
   font-size: 14px;
   gap: 16px;
@@ -147,8 +147,8 @@ const NavItem = styled.div`
   justify-content: ${props => props.$collapsed ? 'center' : 'flex-start'};
 
   &:hover {
-    color: #2563EB;
-    background-color: ${props => props.$active ? 'rgba(37, 99, 235, 0.06)' : 'rgba(37, 99, 235, 0.03)'};
+    color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
+    background-color: ${({ $active, theme }) => $active ? (theme.colors?.primary?.light || 'rgba(37, 99, 235, 0.06)') : 'rgba(10, 25, 47, 0.03)'};
     transform: ${props => props.$collapsed ? 'none' : 'translateX(4px)'};
   }
 
@@ -160,7 +160,7 @@ const NavItem = styled.div`
       top: 20%;
       height: 60%;
       width: 4px;
-      background-color: #2563EB;
+      background-color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
       border-radius: 0 4px 4px 0;
     }
   `}
@@ -194,7 +194,7 @@ const SubMenuWrapper = styled.div`
 const SubMenuItem = styled(NavItem)`
   padding-left: 48px;
   margin-top: 4px;
-  background-color: ${props => props.$active ? 'rgba(37, 99, 235, 0.04)' : 'transparent'};
+  background-color: ${({ $active, theme }) => $active ? (theme.colors?.primary?.light || 'rgba(37, 99, 235, 0.04)') : 'transparent'};
   
   &::before {
     display: none;
@@ -246,7 +246,7 @@ const SupportDesc = styled.p`
 `;
 
 const SupportButton = styled.button`
-  background-color: #2563EB;
+  background-color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
   color: #FFFFFF;
   border: none;
   border-radius: 8px;
@@ -258,7 +258,7 @@ const SupportButton = styled.button`
   width: 100%;
 
   &:hover {
-    background-color: #1D4ED8;
+    background-color: ${({ theme }) => theme.colors?.primary?.hover || '#1D4ED8'};
   }
 `;
 
@@ -282,15 +282,15 @@ const ToggleButton = styled.button`
 
   &:hover {
     background-color: rgba(10, 25, 47, 0.05);
-    color: #2563EB;
+    color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
   }
 `;
 
 const SearchContainer = styled.div`
   display: flex;
   align-items: center;
-  background-color: #F8FAFC;
-  border: 1px solid #E2E8F0;
+  background-color: ${({ theme }) => theme.colors?.neutral?.background || '#F8FAFC'};
+  border: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E2E8F0'};
   border-radius: 12px;
   padding: 8px 14px;
   width: 280px;
@@ -298,13 +298,13 @@ const SearchContainer = styled.div`
   transition: all 0.2s ease-in-out;
 
   &:focus-within {
-    border-color: #2563EB;
-    background-color: #FFFFFF;
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    border-color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
+    background-color: ${({ theme }) => theme.colors?.neutral?.surface || '#FFFFFF'};
+    box-shadow: 0 0 0 3px ${({ theme }) => theme.colors?.primary?.light || 'rgba(37, 99, 235, 0.1)'};
   }
 
   svg {
-    color: #94A3B8;
+    color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#94A3B8'};
     font-size: 20px;
   }
 
@@ -319,10 +319,12 @@ const SearchInput = styled.input`
   outline: none;
   width: 100%;
   font-size: 14px;
-  color: #0A192F;
+  color: ${({ theme }) => theme.colors?.neutral?.textPrimary || '#0A192F'};
+  font-family: inherit;
 
   &::placeholder {
-    color: #94A3B8;
+    color: ${({ theme }) => theme.colors?.neutral?.textPrimary || '#0A192F'};
+    opacity: 0.5;
   }
 `;
 
@@ -338,14 +340,14 @@ const CalendarShortcut = styled.div`
   gap: 8px;
   padding: 8px 14px;
   border-radius: 12px;
-  background-color: #F8FAFC;
-  border: 1px solid #E2E8F0;
-  color: #64748B;
+  background-color: ${({ theme }) => theme.colors?.neutral?.background || '#F8FAFC'};
+  border: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E2E8F0'};
+  color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#64748B'};
   font-size: 13px;
   font-weight: 500;
   
   svg {
-    color: #2563EB;
+    color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
     font-size: 18px;
   }
 
@@ -357,21 +359,21 @@ const CalendarShortcut = styled.div`
 const IconButton = styled.button`
   background: none;
   border: none;
-  color: #64748B;
+  color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#64748B'};
   cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 8px;
   border-radius: 12px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E2E8F0'};
   transition: all 0.2s ease-in-out;
   position: relative;
 
   &:hover {
-    color: #2563EB;
-    background-color: rgba(37, 99, 235, 0.05);
-    border-color: rgba(37, 99, 235, 0.1);
+    color: ${({ theme }) => theme.colors?.primary?.main || '#2563EB'};
+    background-color: ${({ theme }) => theme.colors?.primary?.light || 'rgba(37, 99, 235, 0.05)'};
+    border-color: ${({ theme }) => theme.colors?.primary?.light || 'rgba(37, 99, 235, 0.1)'};
   }
   
   svg {
@@ -386,12 +388,12 @@ const UserDropdownWrapper = styled.div`
   cursor: pointer;
   padding: 6px 12px;
   border-radius: 12px;
-  border: 1px solid #E2E8F0;
+  border: 1px solid ${({ theme }) => theme.colors?.neutral?.divider || '#E2E8F0'};
   transition: all 0.2s ease-in-out;
 
   &:hover {
-    background-color: #F8FAFC;
-    border-color: #CBD5E1;
+    background-color: ${({ theme }) => theme.colors?.neutral?.background || '#F8FAFC'};
+    border-color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#CBD5E1'};
   }
 `;
 
@@ -408,13 +410,13 @@ const UserDetails = styled.div`
 const UserName = styled.span`
   font-size: 13px;
   font-weight: 600;
-  color: #0A192F;
+  color: ${({ theme }) => theme.colors?.neutral?.textPrimary || '#0A192F'};
   line-height: 1.2;
 `;
 
 const UserRole = styled.span`
   font-size: 11px;
-  color: #64748B;
+  color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#64748B'};
   margin-top: 2px;
 `;
 
@@ -434,7 +436,7 @@ const CloseButton = styled.button`
     display: flex;
     background: none;
     border: none;
-    color: #64748B;
+    color: ${({ theme }) => theme.colors?.neutral?.textSecondary || '#64748B'};
     position: absolute;
     top: 22px;
     right: 20px;
@@ -449,6 +451,7 @@ const DashboardLayout = ({ children }) => {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, role, logout } = useAuth();
+  const theme = useTheme();
 
   const menuItems = [
     { key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
@@ -492,7 +495,7 @@ const DashboardLayout = ({ children }) => {
       
       <SidebarWrapper $collapsed={collapsed} $mobileOpen={mobileOpen}>
         <LogoArea $collapsed={collapsed}>
-          <MedicalServicesIcon style={{ fontSize: 24, color: '#2563EB' }} />
+          <MedicalServicesIcon style={{ fontSize: 24, color: theme?.colors?.primary?.main || '#2563EB' }} />
           <LogoText $collapsed={collapsed}>HealthManager</LogoText>
           <CloseButton onClick={() => setMobileOpen(false)}>
             <CloseIcon />
@@ -514,36 +517,6 @@ const DashboardLayout = ({ children }) => {
               </NavItem>
             );
           })}
-          
-          {user?.role_id === 1 && (
-            <>
-              <NavItem 
-                $active={location.pathname.startsWith('/settings')} 
-                $collapsed={collapsed}
-                onClick={() => setSettingsOpen(!settingsOpen)}
-                style={{ justifyContent: 'space-between' }}
-              >
-                <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
-                  <SettingsIcon />
-                  <NavLabel $collapsed={collapsed}>Settings</NavLabel>
-                </div>
-                {!collapsed && (
-                  settingsOpen ? <ExpandLessIcon style={{ fontSize: 18 }} /> : <ExpandMoreIcon style={{ fontSize: 18 }} />
-                )}
-              </NavItem>
-              
-              <SubMenuWrapper $isOpen={settingsOpen && !collapsed}>
-                <SubMenuItem 
-                  $active={location.pathname === '/settings/theme'} 
-                  $collapsed={collapsed}
-                  onClick={() => handleMenuClick('/settings/theme')}
-                >
-                  <PaletteIcon style={{ fontSize: 18 }} />
-                  <NavLabel $collapsed={collapsed}>Appearance</NavLabel>
-                </SubMenuItem>
-              </SubMenuWrapper>
-            </>
-          )}
         </NavList>
         
         <SupportCard $collapsed={collapsed}>
@@ -590,16 +563,16 @@ const DashboardLayout = ({ children }) => {
             <Dropdown menu={{ items: userMenuItems }} placement="bottomRight">
               <UserDropdownWrapper>
                 <Avatar 
-                  style={{ backgroundColor: '#2563EB', verticalAlign: 'middle' }}
+                  style={{ backgroundColor: theme?.colors?.primary?.main || '#2563EB', verticalAlign: 'middle' }}
                   size="medium"
                 >
                   {user?.name ? user.name.charAt(0).toUpperCase() : 'D'}
                 </Avatar>
                 <UserDetails>
                   <UserName>{user?.name || 'Doctor'}</UserName>
-                  <UserRole>Healthcare Pro</UserRole>
+                  <UserRole>{user?.role_id === 1 ? 'Admin' : (user?.role_id === 2 ? 'Doctor' : (user?.role_id === 3 ? 'Nurse' : 'Healthcare Pro'))}</UserRole>
                 </UserDetails>
-                <ArrowDropDownIcon style={{ color: '#64748B', fontSize: 20 }} />
+                <ArrowDropDownIcon style={{ color: theme?.colors?.neutral?.textSecondary || '#64748B', fontSize: 20 }} />
               </UserDropdownWrapper>
             </Dropdown>
           </HeaderRight>

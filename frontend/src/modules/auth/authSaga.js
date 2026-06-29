@@ -19,6 +19,7 @@ import {
   initializeAuthSuccess,
   initializeAuthFailure
 } from './authSlice';
+import { fetchThemeRequest, clearThemeConfig } from '../tenant/tenantSlice';
 
 // Worker Sagas
 function* handleLogin(action) {
@@ -35,6 +36,9 @@ function* handleLogin(action) {
     // Optionally fetch full profile here if not returned by login
     // const profile = yield call(authAPI.getProfile);
     
+    // Fetch the specific theme immediately upon login
+    yield put(fetchThemeRequest());
+    
     yield put(loginSuccess({ user, accessToken: access_token }));
   } catch (error) {
     yield put(loginFailure(error.message));
@@ -50,6 +54,7 @@ function* handleLogout() {
   } finally {
     tokenService.clearAllTokens();
     csrfService.clearCsrfToken();
+    yield put(clearThemeConfig());
     yield put(logoutSuccess());
     window.location.href = '/login';
   }
