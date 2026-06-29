@@ -1,5 +1,6 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { prescriptionAPI } from './prescriptionAPI';
+import {verifyPrescriptionRequest,dispensePrescriptionRequest} from './prescriptionSlice';
 
 import {
   fetchPrescriptionsRequest,
@@ -199,6 +200,39 @@ function* handleUpdateStatus(action) {
   }
 }
 
+function* handleVerifyPrescription(action) {
+  try {
+    const response = yield call(
+      prescriptionAPI.verify,
+      action.payload
+    );
+
+    yield put(updateStatusSuccess({
+      id: action.payload,
+      status: 'VERIFIED',
+      data: response,
+    }));
+  } catch (error) {
+    yield put(updateStatusFailure(error.message));
+  }
+}
+
+function* handleDispensePrescription(action) {
+  try {
+    const response = yield call(
+      prescriptionAPI.dispense,
+      action.payload
+    );
+
+    yield put(updateStatusSuccess({
+      id: action.payload,
+      status: 'DISPENSED',
+      data: response,
+    }));
+  } catch (error) {
+    yield put(updateStatusFailure(error.message));
+  }
+}
 
 // ---------------- ROOT SAGA ----------------
 export default function* prescriptionSaga() {
@@ -214,5 +248,7 @@ export default function* prescriptionSaga() {
     takeLatest(deleteItemRequest.type, handleDeleteItem),
 
     takeLatest(updateStatusRequest.type, handleUpdateStatus),
+    takeLatest(verifyPrescriptionRequest.type, handleVerifyPrescription),
+    takeLatest(dispensePrescriptionRequest.type, handleDispensePrescription),
   ]);
 }

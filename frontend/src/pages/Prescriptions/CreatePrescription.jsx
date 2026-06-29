@@ -1,8 +1,9 @@
-import React from 'react';
-import { Form, Input, Button, InputNumber, Card } from 'antd';
+import React, { useEffect, useState } from 'react';
+import { Form, Input, Button, InputNumber, Card, Select } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { usePrescription } from '../../modules/prescription/hooks/usePrescription';
+import { apiService } from '../../services/apiService';
 
 const { TextArea } = Input;
 
@@ -10,10 +11,51 @@ const CreatePrescription = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
-  const {
-    createPrescription,
-    submitting,
-  } = usePrescription();
+  const [patients, setPatients] = useState([]);
+  const [providers, setProviders] = useState([]);
+
+  const { createPrescription, submitting } = usePrescription();
+
+  useEffect(() => {
+    loadPatients();
+    loadProviders();
+  }, []);
+
+  const loadPatients = async () => {
+    try {
+      const res = await apiService.get('/patients');
+      setPatients(res?.patients || res || []);
+    } catch (err) {
+      console.log('Patient load error', err);
+    }
+  };
+
+  // ✅ FIXED: /api/staff is ADMIN only → use /api/users instead
+  // /api/users allows ADMIN + PROVIDER + NURSE roles
+  const loadProviders = async () => {
+    try {
+      const res = await apiService.get('/users');
+      const users =
+      Array.isArray(res)
+        ? res
+        : Array.isArray(res?.users)
+        ? res.users
+        : Array.isArray(res?.data)
+        ? res.data
+        : Array.isArray(res?.data?.users)
+        ? res.data.users
+        : [];
+      console.log('USERS API RESPONSE:', users);
+
+    const providers = users.filter(
+      (u) => Number(u.role_id) === 2
+    );
+
+    setProviders(providers);
+  } catch (err) {
+    console.log('Provider load error', err);
+  }
+};
 
   const onFinish = (values) => {
     createPrescription(values);
@@ -23,30 +65,52 @@ const CreatePrescription = () => {
   return (
     <DashboardLayout>
       <Card title="Create Prescription">
-
         <Form form={form} layout="vertical" onFinish={onFinish}>
 
+          {/* Patient Dropdown */}
           <Form.Item
             name="patient_id"
-            label="Patient ID"
-            rules={[{ required: true }]}
+            label="Patient"
+            rules={[{ required: true, message: 'Please select a patient' }]}
           >
-            <Input />
+            <Select
+              placeholder="Select Patient"
+              showSearch
+              optionFilterProp="children"
+            >
+              {patients.map((p) => (
+                <Select.Option key={p.id} value={p.id}>
+                  {p.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
 
+          {/* Provider Dropdown — now fetched from /api/users */}
           <Form.Item
             name="provider_id"
-            label="Provider ID"
-            rules={[{ required: true }]}
+            label="Provider"
+            rules={[{ required: true, message: 'Please select a provider' }]}
           >
-            <Input />
+            <Select
+              placeholder="Select Provider"
+              showSearch
+              optionFilterProp="children"
+            >
+              {providers.map((p) => (
+                <Select.Option key={p.id} value={p.id}>
+                  {p.name}
+                </Select.Option>
+              ))}
+            </Select>
           </Form.Item>
 
+          {/* Notes */}
           <Form.Item name="notes" label="Notes">
             <TextArea rows={3} />
           </Form.Item>
 
-          {/* SIMPLE ITEMS (no fancy dynamic form yet) */}
+          {/* Medicine Items */}
           <Form.List name="items">
             {(fields, { add, remove }) => (
               <>
@@ -56,7 +120,7 @@ const CreatePrescription = () => {
                       {...field}
                       name={[field.name, 'medicine_name']}
                       label="Medicine Name"
-                      rules={[{ required: true }]}
+                      rules={[{ required: true, message: 'Enter medicine name' }]}
                     >
                       <Input />
                     </Form.Item>
@@ -74,7 +138,7 @@ const CreatePrescription = () => {
                       name={[field.name, 'quantity']}
                       label="Quantity"
                     >
-                      <InputNumber style={{ width: '100%' }} />
+                      <InputNumber style={{ width: '100%' }} min={1} />
                     </Form.Item>
 
                     <Button danger onClick={() => remove(field.name)}>
@@ -83,9 +147,7 @@ const CreatePrescription = () => {
                   </Card>
                 ))}
 
-                <Button onClick={() => add()}>
-                  Add Medicine
-                </Button>
+                <Button onClick={() => add()}>+ Add Medicine</Button>
               </>
             )}
           </Form.List>
@@ -100,7 +162,6 @@ const CreatePrescription = () => {
           </Button>
 
         </Form>
-
       </Card>
     </DashboardLayout>
   );

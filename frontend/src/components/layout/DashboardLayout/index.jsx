@@ -458,7 +458,7 @@ const DashboardLayout = ({ children }) => {
     { key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
     ...(user?.role_id === 2 || user?.role_id === 3 ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
     { key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' },
-    ...(user?.role_id === 1 || user?.role_id === 2 || user?.role_id === 3 || user?.role_id === 4
+    ...(user?.role_id === 2 || user?.role_id === 4 || user?.role_id === 5
     ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }]: []),
     { key: '/billing', icon: <ReceiptIcon />, label: 'Billing' },
     ...(user?.role_id === 1 ? [{ key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' }] : []),

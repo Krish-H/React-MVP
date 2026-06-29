@@ -5,18 +5,20 @@ import { useAuth } from '../modules/auth/hooks/useAuth';
 const ROLE_MAP = {
   'admin': 1,
   'doctor': 2,
+  'provider': 2,
   'nurse': 3,
-  'receptionist': 4,
+  'patient': 4,
   'pharmacist': 5,
+  'receptionist': 6,
 };
 
 const RoleBasedRoute = ({ allowedRoles }) => {
   const { role } = useAuth(); // role is actually role_id
 
-  // Map allowed role strings to role_ids
-  const allowedRoleIds = allowedRoles.map(r => ROLE_MAP[r] || r);
+  const currentRoleId = Number(role);
+  const allowedRoleIds = allowedRoles.map((r) => ROLE_MAP[r] || Number(r));
 
-  if (!allowedRoleIds.includes(role)) {
+  if (!allowedRoleIds.includes(currentRoleId)) {
     // User's role is not authorized, redirect them
     return <Navigate to="/dashboard" replace />;
   }

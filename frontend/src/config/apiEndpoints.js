@@ -38,5 +38,8 @@ export const apiEndpoints = {
     deleteItem: (id, itemId) =>
       `/prescriptions/${id}/items/${itemId}`,
     updateStatus: (id) => `/prescriptions/${id}/status`,
+    verify: (id) => `/prescriptions/${id}/verify`,
+    dispense: (id) => `/prescriptions/${id}/dispense`,
+
   },
 };

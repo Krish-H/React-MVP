@@ -12,6 +12,8 @@ import {
   deleteItemRequest,
 
   updateStatusRequest,
+   verifyPrescriptionRequest,
+  dispensePrescriptionRequest,
 } from '../prescriptionSlice';
 
 export const usePrescription = () => {
@@ -63,6 +65,12 @@ export const usePrescription = () => {
   const updateStatus = (id, status) =>
     dispatch(updateStatusRequest({ id, status }));
 
+  const verifyPrescription = (id) =>
+  dispatch(verifyPrescriptionRequest(id));
+
+  const dispensePrescription = (id) =>
+  dispatch(dispensePrescriptionRequest(id));
+
   return {
     // STATE
     prescriptions,
@@ -92,5 +100,9 @@ export const usePrescription = () => {
     updateItem,
     deleteItem,
     updateStatus,
+    
+    verifyPrescription,
+    dispensePrescription,
+
   };
 };

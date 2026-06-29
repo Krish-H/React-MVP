@@ -25,4 +25,10 @@ export const prescriptionAPI = {
 
   updateStatus: (id, status) =>
     apiService.put(apiEndpoints.prescriptions.updateStatus(id), { status }),
+
+    verify: (id) =>
+        apiService.post(apiEndpoints.prescriptions.verify(id)),
+
+    dispense: (id) =>
+        apiService.post(apiEndpoints.prescriptions.dispense(id)),
 };

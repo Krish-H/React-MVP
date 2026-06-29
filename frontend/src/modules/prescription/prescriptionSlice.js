@@ -189,6 +189,15 @@ const prescriptionSlice = createSlice({
       state.statusLoading = false;
       state.statusError = action.payload;
     },
+    verifyPrescriptionRequest: (state) => {
+  state.statusLoading = true;
+  state.statusError = null;
+},
+
+dispensePrescriptionRequest: (state) => {
+  state.statusLoading = true;
+  state.statusError = null;
+},
   },
 });
 
@@ -224,6 +233,10 @@ export const {
   updateStatusRequest,
   updateStatusSuccess,
   updateStatusFailure,
+
+  verifyPrescriptionRequest,
+  dispensePrescriptionRequest,
+  
 } = prescriptionSlice.actions;
 
 export default prescriptionSlice.reducer;

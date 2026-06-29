@@ -68,14 +68,13 @@ const AppRouter = () => {
           </Route>
 
           {/* Prescription Module */}
-          <Route
-            element={
-              <RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse', 'pharmacist']} />
-            }
-          >
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'pharmacist', 'patient']} />}>
             <Route path="/prescriptions" element={<PrescriptionList />} />
-            <Route path="/prescriptions/create" element={<CreatePrescription />} />
             <Route path="/prescriptions/:id" element={<PrescriptionDetails />} />
+          </Route>
+
+          <Route element={<RoleBasedRoute allowedRoles={['provider']} />}>
+            <Route path="/prescriptions/create" element={<CreatePrescription />} />
           </Route>
 
           {/* Admin only routes */}
