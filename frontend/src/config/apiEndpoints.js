@@ -27,6 +27,13 @@ export const apiEndpoints = {
     activate: (id) => `/staff/${id}/activate`,
     deactivate: (id) => `/staff/${id}/deactivate`,
   },
+  appointments: {
+    list:   '/appointments',
+    create: '/appointments',
+    detail: (id) => `/appointments/${id}`,
+    update: (id) => `/appointments/${id}`,
+    cancel: (id) => `/appointments/${id}`,
+  },
    prescriptions: {
     list: '/prescriptions',
     create: '/prescriptions',
