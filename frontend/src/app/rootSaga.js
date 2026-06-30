@@ -2,10 +2,10 @@ import { all } from 'redux-saga/effects';
 import authSaga from '../modules/auth/authSaga';
 import dashboardSaga from '../modules/dashboard/dashboardSaga';
 import tenantSaga from '../modules/tenant/tenantSaga';
-
-import patientSaga from '../modules/patients/patientSaga';
-
 import staffSaga from '../modules/staff/staffSaga';
+import patientSaga from '../modules/patients/patientSaga';
+import appointmentSaga from '../modules/appointment/appointmentSaga';
+
 import prescriptionSaga from '../modules/prescription/prescriptionSaga';
 export default function* rootSaga() {
   yield all([
@@ -14,6 +14,7 @@ export default function* rootSaga() {
     tenantSaga(),
     patientSaga(),
     staffSaga(),
+    appointmentSaga(),
     prescriptionSaga(),
   ]);
 }
