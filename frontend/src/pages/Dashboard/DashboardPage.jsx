@@ -163,6 +163,8 @@ const DashboardPage = () => {
       totalAppointments = 0, 
       totalInvoices = 0, 
       pendingInvoices = 0,
+      totalRevenue = 0,
+      pendingAmount = 0,
       recentAppointments = []
     } = metrics || {};
 
@@ -248,6 +250,8 @@ const DashboardPage = () => {
                   <RevenueSummary 
                     totalInvoices={totalInvoices} 
                     pendingInvoices={pendingInvoices} 
+                    totalRevenue={totalRevenue}
+                    pendingAmount={pendingAmount}
                   />
                   <RecentActivity />
                 </div>
