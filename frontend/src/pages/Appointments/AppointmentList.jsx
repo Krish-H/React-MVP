@@ -123,8 +123,8 @@ const AppointmentList = () => {
         <span style={{ fontWeight: 600, color: '#2563EB', fontFamily: 'monospace' }}>APT-{id}</span>
       ),
     },
-    { title: 'Patient',  dataIndex: 'patient_id',  key: 'patient_id',  render: (v) => patientMap[v]  || `Patient #${v}`  },
-    { title: 'Provider', dataIndex: 'provider_id', key: 'provider_id', render: (v) => providerMap[v] || `Provider #${v}` },
+    { title: 'Patient',  key: 'patient',  render: (_, r) => r.patient_name || patientMap[r.patient_id]  || `Patient #${r.patient_id}`  },
+    { title: 'Provider', key: 'provider', render: (_, r) => r.provider_name || providerMap[r.provider_id] || `Provider #${r.provider_id}` },
     { title: 'Date',     dataIndex: 'appointment_date', key: 'appointment_date' },
     { title: 'Time',     dataIndex: 'appointment_time', key: 'appointment_time' },
     {

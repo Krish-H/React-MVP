@@ -44,7 +44,6 @@ const ROLES = [
   { value: 1, label: 'Admin', color: 'red' },
   { value: 2, label: 'Provider', color: 'blue' },
   { value: 3, label: 'Nurse', color: 'green' },
-  { value: 4, label: 'Patient', color: 'purple' },
   { value: 5, label: 'Pharmacist', color: 'orange' },
   { value: 6, label: 'Receptionist', color: 'cyan' },
 ];
@@ -136,7 +135,7 @@ const StaffManagement = () => {
         name: values.name,
         email: values.email,
         password: values.password,
-        role_id: values.role_id,
+        role: values.role_id,
       };
       
       const staffData = {

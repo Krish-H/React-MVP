@@ -29,7 +29,7 @@ const getStatusColor = (status) => {
   }
 };
 
-const PrescriptionList = () => {
+const PharmacyList = () => {
   const navigate = useNavigate();
 
   const {
@@ -104,8 +104,8 @@ const PrescriptionList = () => {
       title: 'Actions',
       render: (_, record) => (
         <div style={{ display: 'flex', gap: 8 }}>
-          <Button onClick={() => navigate(`/prescriptions/${record.id}`)}>
-            View
+          <Button onClick={() => navigate(`/pharmacy/${record.id}`)}>
+            Manage
           </Button>
         </div>
       ),
@@ -115,15 +115,8 @@ const PrescriptionList = () => {
   return (
     <DashboardLayout>
       <Wrapper>
-
         <Header>
-          <h2>Prescription Management</h2>
-          <Button
-            type="primary"
-            onClick={() => navigate('/prescriptions/create')}
-          >
-            Create Prescription
-          </Button>
+          <h2>Pharmacy - Prescription Queue</h2>
         </Header>
 
         {listError && <Alert type="error" message={listError} />}
@@ -141,4 +134,4 @@ const PrescriptionList = () => {
   );
 };
 
-export default PrescriptionList;
+export default PharmacyList;
