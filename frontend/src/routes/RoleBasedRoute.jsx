@@ -20,6 +20,9 @@ const RoleBasedRoute = ({ allowedRoles }) => {
 
   if (!allowedRoleIds.includes(currentRoleId)) {
     // User's role is not authorized, redirect them
+    if (currentRoleId === 4) {
+      return <Navigate to="/appointments" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 

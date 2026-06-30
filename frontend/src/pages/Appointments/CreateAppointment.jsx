@@ -10,6 +10,7 @@ import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useAppointments } from '../../modules/appointment/hooks/useAppointments';
 import { useStaff } from '../../modules/staff/hooks/useStaff';
 import { usePatients } from '../../modules/patients/hooks/usePatients';
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
@@ -104,6 +105,7 @@ const CancelBtn = styled(Button)`
 const CreateAppointment = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
+  const { user } = useAuth();
   const { createAppointment, submitting, submitSuccess, submitError, resetSubmit } = useAppointments();
   const { users, loading: staffLoading, fetchUsers } = useStaff();
   const { list: patientList, listLoading: patientLoading, fetchPatients } = usePatients();
@@ -140,6 +142,9 @@ const CreateAppointment = () => {
   }, [submitError]);
 
   const handleFinish = (values) => {
+    if (user?.role_id === 2) {
+      values.provider_id = user.id;
+    }
     createAppointment(values);
   };
 
@@ -177,21 +182,23 @@ const CreateAppointment = () => {
                 />
               </Form.Item>
 
-              <Form.Item
-                name="provider_id"
-                label="Provider"
-                rules={[{ required: true, message: 'Provider is required' }]}
-              >
-                <Select
-                  placeholder="Select a provider"
-                  options={providerOptions}
-                  loading={staffLoading}
-                  showSearch
-                  filterOption={(input, option) =>
-                    option.label.toLowerCase().includes(input.toLowerCase())
-                  }
-                />
-              </Form.Item>
+              {user?.role_id !== 2 && (
+                <Form.Item
+                  name="provider_id"
+                  label="Provider"
+                  rules={[{ required: true, message: 'Provider is required' }]}
+                >
+                  <Select
+                    placeholder="Select a provider"
+                    options={providerOptions}
+                    loading={staffLoading}
+                    showSearch
+                    filterOption={(input, option) =>
+                      option.label.toLowerCase().includes(input.toLowerCase())
+                    }
+                  />
+                </Form.Item>
+              )}
 
               <Form.Item
                 name="date"

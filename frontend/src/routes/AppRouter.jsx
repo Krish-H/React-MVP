@@ -24,6 +24,9 @@ const ThemeSettings = lazy(() => import('../pages/Settings/ThemeSettings'));
 const PrescriptionList = lazy(() => import('../pages/Prescriptions/PrescriptionList'));
 const CreatePrescription = lazy(() => import('../pages/Prescriptions/CreatePrescription'));
 const PrescriptionDetails = lazy(() => import('../pages/Prescriptions/PrescriptionDetails'));
+const UserManagement = lazy(() => import('../pages/Settings/UserManagement'));
+const PharmacyList = lazy(() => import('../pages/Pharmacy/PharmacyList'));
+const PharmacyDetails = lazy(() => import('../pages/Pharmacy/PharmacyDetails'));
 
 const AppRouter = () => {
   const tenant = getTenantFromDomain();
@@ -57,15 +60,21 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         >
-          {/* Dashboard is available to all authenticated users */}
-          <Route path="/dashboard" element={<DashboardPage />} />
+          {/* Dashboard is restricted from patients */}
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse', 'provider', 'pharmacist', 'receptionist']} />}>
+            <Route path="/dashboard" element={<DashboardPage />} />
+          </Route>
 
-          {/* Patients and Appointments available to Admin, Doctor, Nurse */}
+          {/* Patients management available to Admin, Doctor, Nurse */}
           <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse']} />}>
             <Route path="/patients" element={<PatientList />} />
             <Route path="/patients/add" element={<AddPatient />} />
             <Route path="/patients/:id" element={<PatientDetails />} />
             <Route path="/patients/:id/edit" element={<EditPatient />} />
+          </Route>
+
+          {/* Appointments available to Admin, Doctor, Nurse, Patient */}
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'provider', 'nurse', 'patient']} />}>
             <Route path="/appointments" element={<AppointmentList />} />
             <Route path="/appointments/create" element={<CreateAppointment />} />
             <Route path="/appointments/:id" element={<AppointmentDetails />} />
@@ -73,9 +82,15 @@ const AppRouter = () => {
           </Route>
 
           {/* Prescription Module */}
-          <Route element={<RoleBasedRoute allowedRoles={['provider', 'pharmacist', 'patient']} />}>
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'patient']} />}>
             <Route path="/prescriptions" element={<PrescriptionList />} />
             <Route path="/prescriptions/:id" element={<PrescriptionDetails />} />
+          </Route>
+
+          {/* Pharmacy Module */}
+          <Route element={<RoleBasedRoute allowedRoles={['pharmacist']} />}>
+            <Route path="/pharmacy" element={<PharmacyList />} />
+            <Route path="/pharmacy/:id" element={<PharmacyDetails />} />
           </Route>
 
           <Route element={<RoleBasedRoute allowedRoles={['provider']} />}>
@@ -86,6 +101,7 @@ const AppRouter = () => {
           <Route element={<RoleBasedRoute allowedRoles={['admin']} />}>
             <Route path="/billing" element={<InvoicePage />} />
             <Route path="/staff" element={<StaffManagement />} />
+            <Route path="/users" element={<UserManagement />} />
             <Route path="/settings/theme" element={<ThemeSettings />} />
           </Route>
         </Route>

@@ -21,6 +21,8 @@ export const apiEndpoints = {
   dashboard: '/dashboard',
   users: {
     base: '/users',
+    activate: (id) => `/users/${id}/activate`,
+    deactivate: (id) => `/users/${id}/deactivate`,
   },
   staff: {
     base: '/staff',

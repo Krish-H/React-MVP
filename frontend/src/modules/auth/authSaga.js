@@ -79,7 +79,8 @@ function* handleRefreshToken() {
 function* handleGetProfile() {
   try {
     const response = yield call(authAPI.getProfile);
-    yield put(getProfileSuccess(response));
+    const userProfile = response.user || response;
+    yield put(getProfileSuccess(userProfile));
   } catch (error) {
     // Handled by axios interceptor if 401
     console.error('Failed to get profile', error);
@@ -112,7 +113,8 @@ function* handleInitializeAuth() {
     
     const token = tokenService.getAccessToken();
     if (token) {
-      const userProfile = yield call(authAPI.getProfile);
+      const profileResponse = yield call(authAPI.getProfile);
+      const userProfile = profileResponse.user || profileResponse;
       yield put(initializeAuthSuccess({ user: userProfile, accessToken: token }));
     } else {
       yield put(initializeAuthFailure());
