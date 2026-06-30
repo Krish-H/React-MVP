@@ -8,6 +8,7 @@ import appointmentSaga from '../modules/appointment/appointmentSaga';
 
 import prescriptionSaga from '../modules/prescription/prescriptionSaga';
 import calendarSaga from '../modules/calendar/calendarSaga';
+import billingSaga from '../modules/billing/billingSaga';
 
 export default function* rootSaga() {
   yield all([
@@ -19,5 +20,6 @@ export default function* rootSaga() {
     appointmentSaga(),
     prescriptionSaga(),
     calendarSaga(),
+    billingSaga(),
   ]);
 }

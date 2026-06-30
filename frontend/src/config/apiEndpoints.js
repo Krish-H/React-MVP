@@ -48,4 +48,12 @@ export const apiEndpoints = {
     verify:       (id) => `/prescriptions/${id}/verify`,
     dispense:     (id) => `/prescriptions/${id}/dispense`,
   },
+  billing: {
+    list: '/invoices',
+    myInvoices: '/invoices/my',
+    pendingSummary: '/invoices/pending-summary',
+    paidSummary: '/invoices/paid-summary',
+    create: '/invoices',
+    updateStatus: (id) => `/invoices/${id}`
+  }
 };

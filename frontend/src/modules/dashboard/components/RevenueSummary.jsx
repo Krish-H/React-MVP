@@ -109,12 +109,8 @@ const ColValue = styled(Text)`
   }
 `;
 
-const RevenueSummary = ({ totalInvoices = 0, pendingInvoices = 0 }) => {
-  // Mock total amounts based on count for demonstration
-  const totalRevenue = totalInvoices * 150; 
-  const pendingAmount = pendingInvoices * 150;
-  
-  const percentage = totalInvoices === 0 ? 0 : Math.round(((totalInvoices - pendingInvoices) / totalInvoices) * 100);
+const RevenueSummary = ({ totalInvoices = 0, pendingInvoices = 0, totalRevenue = 0, pendingAmount = 0 }) => {
+  const percentage = totalRevenue === 0 ? 0 : Math.round(((totalRevenue - pendingAmount) / totalRevenue) * 100);
 
   return (
     <StyledCard title="Revenue Summary">

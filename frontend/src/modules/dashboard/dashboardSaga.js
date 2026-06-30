@@ -20,6 +20,8 @@ function* handleFetchDashboard() {
       scheduledAppointments: data.scheduled_appointments || 0,
       completedAppointments: data.completed_appointments || 0,
       cancelledAppointments: data.cancelled_appointments || 0,
+      totalRevenue: data.total_revenue || 0,
+      pendingAmount: data.pending_amount || 0,
     };
     
     yield put(fetchDashboardSuccess(formattedMetrics));
