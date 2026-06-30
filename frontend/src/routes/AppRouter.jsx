@@ -27,6 +27,7 @@ const PrescriptionDetails = lazy(() => import('../pages/Prescriptions/Prescripti
 const UserManagement = lazy(() => import('../pages/Settings/UserManagement'));
 const PharmacyList = lazy(() => import('../pages/Pharmacy/PharmacyList'));
 const PharmacyDetails = lazy(() => import('../pages/Pharmacy/PharmacyDetails'));
+const CalendarPage = lazy(() => import('../pages/Calendar/CalendarPage'));
 
 const AppRouter = () => {
   const tenant = getTenantFromDomain();
@@ -95,6 +96,11 @@ const AppRouter = () => {
 
           <Route element={<RoleBasedRoute allowedRoles={['provider']} />}>
             <Route path="/prescriptions/create" element={<CreatePrescription />} />
+          </Route>
+
+          {/* Calendar — Receptionist only */}
+          <Route element={<RoleBasedRoute allowedRoles={['receptionist']} />}>
+            <Route path="/calendar" element={<CalendarPage />} />
           </Route>
 
           {/* Admin only routes */}
