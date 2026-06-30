@@ -1,9 +1,10 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table, Tag, Button, Spin, Alert } from 'antd';
 import { useNavigate } from 'react-router-dom';
 import styled from 'styled-components';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { usePrescription } from '../../modules/prescription/hooks/usePrescription';
+import { apiService } from '../../services/apiService';
 
 const Wrapper = styled.div`
   padding: 20px;
@@ -17,12 +18,14 @@ const Header = styled.div`
 
 const getStatusColor = (status) => {
   switch (status) {
-    case 'COMPLETED':
-      return 'green';
-    case 'CANCELLED':
-      return 'red';
-    default:
+    case 'PENDING':
       return 'orange';
+    case 'VERIFIED':
+      return 'blue';
+    case 'DISPENSED':
+      return 'green';
+    default:
+      return 'default';
   }
 };
 
@@ -36,9 +39,40 @@ const PrescriptionList = () => {
     fetchPrescriptions,
   } = usePrescription();
 
+  const [patients, setPatients] = useState([]);
+  const [users, setUsers] = useState([]);
+
   useEffect(() => {
     fetchPrescriptions();
+    loadPatients();
+    loadUsers();
   }, []);
+
+  const loadPatients = async () => {
+    try {
+      const res = await apiService.get('/patients');
+      setPatients(res.patients || res.data || res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const loadUsers = async () => {
+    try {
+      const res = await apiService.get('/users');
+      setUsers(res.users || res.data || res);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  const patientMap = Object.fromEntries(
+    patients.map((p) => [p.id, p.name])
+  );
+
+  const providerMap = Object.fromEntries(
+    users.map((u) => [u.id, u.name])
+  );
 
   const columns = [
     {
@@ -47,11 +81,13 @@ const PrescriptionList = () => {
     },
     {
       title: 'Patient',
-      dataIndex: 'patient_id',
+      render: (_, record) =>
+        patientMap[record.patient_id] || record.patient_id,
     },
     {
       title: 'Provider',
-      dataIndex: 'provider_id',
+      render: (_, record) =>
+        providerMap[record.provider_id] || record.provider_id,
     },
     {
       title: 'Status',
