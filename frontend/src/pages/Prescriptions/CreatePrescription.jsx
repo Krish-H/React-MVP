@@ -4,30 +4,22 @@ import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { usePrescription } from '../../modules/prescription/hooks/usePrescription';
 import { apiService } from '../../services/apiService';
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 
 const { TextArea } = Input;
 
-const normalizeArray = (res, key) => {
-  return (
-    res?.[key] ||
-    res?.data?.[key] ||
-    res?.data ||
-    res ||
-    []
-  );
-};
+
 const CreatePrescription = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [form] = Form.useForm();
 
   const [patients, setPatients] = useState([]);
-  const [providers, setProviders] = useState([]);
-
+  
   const { createPrescription, submitting } = usePrescription();
 
   useEffect(() => {
     loadPatients();
-    loadProviders();
   }, []);
 
   const loadPatients = async () => {
@@ -39,28 +31,15 @@ const CreatePrescription = () => {
     }
   };
 
-  // ✅ FIXED: /api/staff is ADMIN only → use /api/users instead
-  // /api/users allows ADMIN + PROVIDER + NURSE roles
-  const loadProviders = async () => {
-    try {
-      const res = await apiService.get('/users');
-     const users = normalizeArray(res, 'users');
-      console.log('USERS API RESPONSE:', users);
-
-    const providers = users.filter(
-      (u) => Number(u.role_id) === 2
-    );
-
-    setProviders(providers);
-  } catch (err) {
-    console.log('Provider load error', err);
-  }
-};
-
   const onFinish = (values) => {
-    createPrescription(values);
-    navigate('/prescriptions');
+  const payload = {
+    ...values,
+    provider_id: user.id 
   };
+
+  createPrescription(payload);
+  navigate('/prescriptions');
+};
 
   return (
     <DashboardLayout>
@@ -86,24 +65,6 @@ const CreatePrescription = () => {
             </Select>
           </Form.Item>
 
-          {/* Provider Dropdown — now fetched from /api/users */}
-          <Form.Item
-            name="provider_id"
-            label="Provider"
-            rules={[{ required: true, message: 'Please select a provider' }]}
-          >
-            <Select
-              placeholder="Select Provider"
-              showSearch
-              optionFilterProp="children"
-            >
-              {providers.map((p) => (
-                <Select.Option key={p.id} value={p.id}>
-                  {p.name}
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
 
           {/* Notes */}
           <Form.Item name="notes" label="Notes">
