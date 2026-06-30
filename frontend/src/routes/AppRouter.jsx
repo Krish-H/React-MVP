@@ -19,6 +19,9 @@ const AppointmentList = lazy(() => import('../pages/Appointments/AppointmentList
 const InvoicePage = lazy(() => import('../pages/Billing/InvoicePage'));
 const StaffManagement = lazy(() => import('../pages/Staff/StaffManagement'));
 const ThemeSettings = lazy(() => import('../pages/Settings/ThemeSettings'));
+const PrescriptionList = lazy(() => import('../pages/Prescriptions/PrescriptionList'));
+const CreatePrescription = lazy(() => import('../pages/Prescriptions/CreatePrescription'));
+const PrescriptionDetails = lazy(() => import('../pages/Prescriptions/PrescriptionDetails'));
 
 const AppRouter = () => {
   const tenant = getTenantFromDomain();
@@ -45,7 +48,7 @@ const AppRouter = () => {
         )}
 
         {/* Protected Routes inside Main Layout */}
-        <Route 
+        <Route
           element={
             <ProtectedRoute>
               <Outlet />
@@ -54,7 +57,7 @@ const AppRouter = () => {
         >
           {/* Dashboard is available to all authenticated users */}
           <Route path="/dashboard" element={<DashboardPage />} />
-          
+
           {/* Patients and Appointments available to Admin, Doctor, Nurse */}
           <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse']} />}>
             <Route path="/patients" element={<PatientList />} />
@@ -62,6 +65,16 @@ const AppRouter = () => {
             <Route path="/patients/:id" element={<PatientDetails />} />
             <Route path="/patients/:id/edit" element={<EditPatient />} />
             <Route path="/appointments" element={<AppointmentList />} />
+          </Route>
+
+          {/* Prescription Module */}
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'pharmacist', 'patient']} />}>
+            <Route path="/prescriptions" element={<PrescriptionList />} />
+            <Route path="/prescriptions/:id" element={<PrescriptionDetails />} />
+          </Route>
+
+          <Route element={<RoleBasedRoute allowedRoles={['provider']} />}>
+            <Route path="/prescriptions/create" element={<CreatePrescription />} />
           </Route>
 
           {/* Admin only routes */}

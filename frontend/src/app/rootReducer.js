@@ -6,7 +6,7 @@ import tenantReducer from '../modules/tenant/tenantSlice';
 import patientReducer from '../modules/patients/patientSlice';
 
 import staffReducer from '../modules/staff/staffSlice';
-
+import prescriptionReducer from '../modules/prescription/prescriptionSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -14,6 +14,7 @@ const rootReducer = combineReducers({
   tenant: tenantReducer,
   patients: patientReducer,
   staff: staffReducer,
+  prescription: prescriptionReducer,
 
 });
 
