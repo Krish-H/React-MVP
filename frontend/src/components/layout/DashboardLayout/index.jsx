@@ -22,6 +22,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import PaletteIcon from '@mui/icons-material/Palette';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import DescriptionIcon from '@mui/icons-material/Description';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -457,6 +458,8 @@ const DashboardLayout = ({ children }) => {
     { key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
     ...(user?.role_id === 2 || user?.role_id === 3 ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
     { key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' },
+    ...(user?.role_id === 2 || user?.role_id === 4 || user?.role_id === 5
+    ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }]: []),
     { key: '/billing', icon: <ReceiptIcon />, label: 'Billing' },
     ...(user?.role_id === 1 ? [{ key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' }] : []),
   ];
