@@ -23,6 +23,7 @@ import PaletteIcon from '@mui/icons-material/Palette';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DescriptionIcon from '@mui/icons-material/Description';
+import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -455,13 +456,17 @@ const DashboardLayout = ({ children }) => {
   const theme = useTheme();
 
   const menuItems = [
-    { key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' },
+    ...(user?.role_id !== 4 ? [{ key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' }] : []),
     ...(user?.role_id === 2 || user?.role_id === 3 ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
     { key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' },
-    ...(user?.role_id === 2 || user?.role_id === 4 || user?.role_id === 5
+    ...(user?.role_id === 2 || user?.role_id === 4
     ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }]: []),
+    ...(user?.role_id === 5 ? [{ key: '/pharmacy', icon: <LocalPharmacyIcon />, label: 'Pharmacy' }] : []),
     { key: '/billing', icon: <ReceiptIcon />, label: 'Billing' },
-    ...(user?.role_id === 1 ? [{ key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' }] : []),
+    ...(user?.role_id === 1 ? [
+      { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' },
+      { key: '/users', icon: <PeopleIcon />, label: 'Patient Logins' }
+    ] : []),
   ];
 
   const handleMenuClick = (key) => {

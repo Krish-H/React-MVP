@@ -12,6 +12,15 @@ export const staffAPI = {
   updateUser: (id, userData) => {
     return apiService.put(`${apiEndpoints.users.base}/${id}`, userData);
   },
+  deleteUser: (id) => {
+    return apiService.delete(`${apiEndpoints.users.base}/${id}`);
+  },
+  activateUser: (id) => {
+    return apiService.patch(apiEndpoints.users.activate(id));
+  },
+  deactivateUser: (id) => {
+    return apiService.patch(apiEndpoints.users.deactivate(id));
+  },
   
   // Staff profile endpoints
   createStaffProfile: (staffData) => {

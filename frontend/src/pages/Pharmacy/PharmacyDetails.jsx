@@ -35,7 +35,7 @@ const BackBtn = styled.button`
   svg { font-size: 18px; }
 `;
 
-const PrescriptionDetails = () => {
+const PharmacyDetails = () => {
     const { id } = useParams();
     const navigate = useNavigate();
 
@@ -123,13 +123,25 @@ const PrescriptionDetails = () => {
     return (
         <DashboardLayout>
             <div style={{ padding: '20px' }}>
-                <BackBtn onClick={() => navigate('/prescriptions')}>
-                    <ArrowBackIcon /> Back to Prescriptions
+                <BackBtn onClick={() => navigate('/pharmacy')}>
+                    <ArrowBackIcon /> Back to Pharmacy
                 </BackBtn>
                 <Card
                 title={`Prescription #${data.id}`}
                 extra={
                     <Space>
+
+                        {data.status === 'PENDING' && (
+                            <Button type="primary" onClick={() => verifyPrescription(id)}>
+                                Verify
+                            </Button>
+                        )}
+
+                        {data.status === 'VERIFIED' && (
+                            <Button type="primary" onClick={() => dispensePrescription(id)}>
+                                Dispense
+                            </Button>
+                        )}
 
                         <Button type="primary" onClick={openAddModal}>
                             Add Medicine
@@ -183,4 +195,4 @@ const PrescriptionDetails = () => {
     );
 };
 
-export default PrescriptionDetails;
+export default PharmacyDetails;

@@ -33,8 +33,8 @@ function* handleCreateStaff(action) {
   try {
     const { userData, staffData, onSuccess } = action.payload;
     
-    // Create staff member directly using the new API which handles both user and profile
-    yield call(staffAPI.createStaffProfile, userData);
+    // Create user/staff directly using the users API endpoint
+    yield call(staffAPI.createUser, userData);
     
     yield put(createStaffSuccess());
     message.success('Staff member created successfully');
@@ -70,9 +70,9 @@ function* handleUpdateStaff(action) {
 
 function* handleDeleteStaff(action) {
   try {
-    // We only delete the staff profile, not the user account, per architecture decision
+    // Delete user account per API specification
     const { id } = action.payload;
-    yield call(staffAPI.deleteStaff, id);
+    yield call(staffAPI.deleteUser, id);
     
     yield put(deleteStaffSuccess());
     message.success('Staff member removed successfully');
@@ -90,9 +90,9 @@ function* handleToggleStaffStatus(action) {
     const { id, currentStatus } = action.payload;
     
     if (currentStatus === 'active') {
-      yield call(staffAPI.deactivateStaff, id);
+      yield call(staffAPI.deactivateUser, id);
     } else {
-      yield call(staffAPI.activateStaff, id);
+      yield call(staffAPI.activateUser, id);
     }
     
     yield put(toggleStaffStatusSuccess({ id, currentStatus }));

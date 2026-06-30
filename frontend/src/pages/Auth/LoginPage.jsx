@@ -125,13 +125,16 @@ const RegisterLink = styled.span`
 // ─── Component ────────────────────────────────────────────────────────────────
 
 const LoginPage = () => {
-  const { login, loading, isAuthenticated } = useAuth();
+  const { login, loading, isAuthenticated, user } = useAuth();
   const error = useSelector(selectAuthError);
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
   // Already logged in → redirect
   if (isAuthenticated) {
+    if (user?.role_id === 4) {
+      return <Navigate to="/appointments" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 
