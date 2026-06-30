@@ -42,10 +42,11 @@ const SearchContainer = styled.div`
 // Assuming 1: Admin, 2: Doctor, 3: Nurse, 4: Receptionist, 5: Pharmacist
 const ROLES = [
   { value: 1, label: 'Admin', color: 'red' },
-  { value: 2, label: 'Doctor', color: 'blue' },
+  { value: 2, label: 'Provider', color: 'blue' },
   { value: 3, label: 'Nurse', color: 'green' },
-  { value: 4, label: 'Receptionist', color: 'purple' },
+  { value: 4, label: 'Patient', color: 'purple' },
   { value: 5, label: 'Pharmacist', color: 'orange' },
+  { value: 6, label: 'Receptionist', color: 'cyan' },
 ];
 
 const StaffManagement = () => {
