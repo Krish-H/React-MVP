@@ -7,6 +7,7 @@ import staffReducer from '../modules/staff/staffSlice';
 import appointmentReducer from '../modules/appointment/appointmentSlice';
 import prescriptionReducer from '../modules/prescription/prescriptionSlice';
 import noteReducer from '../modules/notes/noteSlice';
+import billingReducer from '../modules/billing/billingSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -17,6 +18,7 @@ const rootReducer = combineReducers({
   appointments: appointmentReducer,
   prescription: prescriptionReducer,
   notes: noteReducer,
+  billing: billingReducer,
 });
 
 export default rootReducer;

@@ -57,4 +57,12 @@ export const apiEndpoints = {
     update: (id) => `/notes/${id}`,
     delete: (id) => `/notes/${id}`,
   },
+  billing: {
+    list: '/invoices',
+    myInvoices: '/invoices/my',
+    pendingSummary: '/invoices/pending-summary',
+    paidSummary: '/invoices/paid-summary',
+    create: '/invoices',
+    updateStatus: (id) => `/invoices/${id}`
+  }
 };
