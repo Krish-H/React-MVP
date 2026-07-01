@@ -5,8 +5,9 @@ import tenantSaga from '../modules/tenant/tenantSaga';
 import staffSaga from '../modules/staff/staffSaga';
 import patientSaga from '../modules/patients/patientSaga';
 import appointmentSaga from '../modules/appointment/appointmentSaga';
-
 import prescriptionSaga from '../modules/prescription/prescriptionSaga';
+import noteSaga from '../modules/notes/noteSaga';
+
 import calendarSaga from '../modules/calendar/calendarSaga';
 import billingSaga from '../modules/billing/billingSaga';
 
@@ -19,6 +20,7 @@ export default function* rootSaga() {
     staffSaga(),
     appointmentSaga(),
     prescriptionSaga(),
+    noteSaga(),
     calendarSaga(),
     billingSaga(),
   ]);
