@@ -12,6 +12,18 @@ const ROLE_MAP = {
   'receptionist': 6,
 };
 
+// Each role's safe landing page — must be a route that role is actually
+// allowed to see, otherwise redirecting here can loop back through
+// RoleBasedRoute again.
+const ROLE_DEFAULT_ROUTE = {
+  1: '/dashboard',   // admin
+  2: '/dashboard',   // doctor / provider
+  3: '/patients',    // nurse (no dashboard access)
+  4: '/appointments', // patient
+  5: '/dashboard',   // pharmacist
+  6: '/dashboard',   // receptionist
+};
+
 const RoleBasedRoute = ({ allowedRoles }) => {
   const { role } = useAuth(); // role is actually role_id
 
@@ -19,11 +31,9 @@ const RoleBasedRoute = ({ allowedRoles }) => {
   const allowedRoleIds = allowedRoles.map((r) => ROLE_MAP[r] || Number(r));
 
   if (!allowedRoleIds.includes(currentRoleId)) {
-    // User's role is not authorized, redirect them
-    if (currentRoleId === 4) {
-      return <Navigate to="/appointments" replace />;
-    }
-    return <Navigate to="/dashboard" replace />;
+    // User's role is not authorized, redirect them to a page they can access
+    const fallback = ROLE_DEFAULT_ROUTE[currentRoleId] || '/login';
+    return <Navigate to={fallback} replace />;
   }
 
   // Authorized, render the child routes
