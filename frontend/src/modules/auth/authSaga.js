@@ -27,14 +27,20 @@ function* handleLogin(action) {
     const response = yield call(authAPI.loginUser, action.payload);
     
     // Store tokens
-    const { access_token, csrf_token, user } = response;
+    const { access_token, csrf_token, user: initialUser } = response;
     tokenService.setAccessToken(access_token);
     if (csrf_token) {
       csrfService.setCsrfToken(csrf_token);
     }
     
-    // Optionally fetch full profile here if not returned by login
-    // const profile = yield call(authAPI.getProfile);
+    // Fetch full profile here to ensure we have the complete and up-to-date user details (e.g. name)
+    let user = initialUser;
+    try {
+      const profileResponse = yield call(authAPI.getProfile);
+      user = profileResponse.user || profileResponse;
+    } catch (profileError) {
+      console.warn('Failed to fetch full profile on login, using initial user info', profileError);
+    }
     
     // Fetch the specific theme immediately upon login
     yield put(fetchThemeRequest());

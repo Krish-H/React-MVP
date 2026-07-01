@@ -172,12 +172,19 @@ const DashboardPage = () => {
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' 
     });
 
+    const getGreeting = () => {
+      const hrs = new Date().getHours();
+      if (hrs < 12) return 'Good Morning';
+      if (hrs < 17) return 'Good Afternoon';
+      return 'Good Evening';
+    };
+
     return (
       <DashboardGrid>
         {/* Hero Welcome Banner */}
         <HeroBanner>
           <HeroContent>
-            <HeroTitle>Good Morning, {user?.name || 'Doctor'}</HeroTitle>
+            <HeroTitle>{getGreeting()}, {user?.name || 'Doctor'}</HeroTitle>
             <HeroSubtitle>Here is your healthcare overview for {today}</HeroSubtitle>
           </HeroContent>
            <HeroImageContainer>
