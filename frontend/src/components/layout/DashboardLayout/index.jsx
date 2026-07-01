@@ -24,6 +24,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import DescriptionIcon from '@mui/icons-material/Description';
 import LocalPharmacyIcon from '@mui/icons-material/LocalPharmacy';
+import CalendarMonthIcon from '@mui/icons-material/CalendarMonth';
 
 const LayoutContainer = styled.div`
   display: flex;
@@ -462,6 +463,7 @@ const DashboardLayout = ({ children }) => {
     ...(user?.role_id === 2 || user?.role_id === 4
     ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }]: []),
     ...(user?.role_id === 5 ? [{ key: '/pharmacy', icon: <LocalPharmacyIcon />, label: 'Pharmacy' }] : []),
+    ...(user?.role_id === 6 ? [{ key: '/calendar', icon: <CalendarMonthIcon />, label: 'Calendar' }] : []),
     ...(user?.role_id !== 3 ? [{ key: '/billing', icon: <ReceiptIcon />, label: 'Billing' }] : []),
     ...(user?.role_id === 1 ? [
       { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' },
