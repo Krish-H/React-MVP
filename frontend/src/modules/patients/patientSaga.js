@@ -3,6 +3,7 @@ import { patientAPI } from './patientAPI';
 import {
   fetchPatientsRequest, fetchPatientsSuccess, fetchPatientsFailure,
   fetchPatientRequest,  fetchPatientSuccess,  fetchPatientFailure,
+  fetchPatientUsersRequest, fetchPatientUsersSuccess, fetchPatientUsersFailure,
   addPatientRequest,    addPatientSuccess,    addPatientFailure,
   updatePatientRequest, updatePatientSuccess, updatePatientFailure,
   deletePatientRequest, deletePatientSuccess, deletePatientFailure,
@@ -26,12 +27,24 @@ function* handleFetchPatient(action) {
   }
 }
 
+function* handleFetchPatientUsers() {
+  try {
+    const response = yield call(patientAPI.getPatientUsers);
+    yield put(fetchPatientUsersSuccess(response.users || response));
+  } catch (error) {
+    yield put(fetchPatientUsersFailure(error.message || 'Failed to fetch patient users'));
+  }
+}
+
 function* handleAddPatient(action) {
   try {
-    const { blood, conditions, emergency, dob, ...rest } = action.payload;
+    const { patient_user_id, dob, gender, phone, blood, address, conditions, emergency } = action.payload;
     const payload = {
-      ...rest,
-      dob:               dob ? dob.format('YYYY-MM-DD') : '',
+      patient_user_id,
+      gender,
+      phone,
+      address,
+      dob:               dob ? dob.format('YYYY-MM-DD') : undefined,
       blood_group:       blood || undefined,
       medical_history:   conditions || undefined,
       emergency_contact: emergency || undefined,
@@ -49,9 +62,11 @@ function* handleAddPatient(action) {
 
 function* handleUpdatePatient(action) {
   try {
-    const { id, blood, conditions, emergency, dob, ...rest } = action.payload;
+    const { id, dob, gender, phone, blood, address, conditions, emergency } = action.payload;
     const payload = {
-      ...rest,
+      gender,
+      phone,
+      address,
       dob:               dob ? (dob.format ? dob.format('YYYY-MM-DD') : dob) : undefined,
       blood_group:       blood || undefined,
       medical_history:   conditions || undefined,
@@ -78,6 +93,7 @@ export default function* patientSaga() {
   yield all([
     takeLatest(fetchPatientsRequest.type, handleFetchPatients),
     takeLatest(fetchPatientRequest.type,  handleFetchPatient),
+    takeLatest(fetchPatientUsersRequest.type, handleFetchPatientUsers),
     takeLatest(addPatientRequest.type,    handleAddPatient),
     takeLatest(updatePatientRequest.type, handleUpdatePatient),
     takeLatest(deletePatientRequest.type, handleDeletePatient),

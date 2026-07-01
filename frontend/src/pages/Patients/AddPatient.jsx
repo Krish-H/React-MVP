@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
 import styled from 'styled-components';
@@ -40,7 +40,30 @@ const HeaderIcon = styled.div`
 
 const AddPatient = () => {
   const navigate = useNavigate();
-  const { addPatient, submitting, submitSuccess, submitError, resetSubmit } = usePatients();
+  const { 
+    addPatient, 
+    submitting, 
+    submitSuccess, 
+    submitError, 
+    resetSubmit,
+    fetchPatientUsers,
+    fetchPatients,
+    patientUsers,
+    list: patients,
+    loadingPatientUsers,
+  } = usePatients();
+
+  useEffect(() => {
+    fetchPatientUsers();
+    fetchPatients();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const availablePatientUsers = useMemo(() => {
+    if (!patientUsers || !patients) return [];
+    const existingUserIds = patients.map(p => p.patient_user_id || p.user?.id || p.user_id).filter(Boolean);
+    return patientUsers.filter(u => !existingUserIds.includes(u.id));
+  }, [patientUsers, patients]);
 
   useEffect(() => {
     if (submitSuccess) {
@@ -85,6 +108,9 @@ const AddPatient = () => {
           submitLabel="Save Patient"
           onSubmit={handleSubmit}
           loading={submitting}
+          patientUsers={availablePatientUsers}
+          loadingPatientUsers={loadingPatientUsers}
+          isEdit={false}
         />
       </PageWrapper>
     </DashboardLayout>

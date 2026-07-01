@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Table, Button, Spin, Alert, Card, Row, Col, Tag, Modal, Form, Input, InputNumber, Select, message } from 'antd';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useBilling } from '../../modules/billing/hooks/useBilling';
+import { useAuth } from '../../modules/auth/hooks/useAuth';
 import { apiService } from '../../services/apiService';
 import styled from 'styled-components';
 
@@ -37,13 +38,18 @@ const StatCard = styled(Card)`
 `;
 
 const InvoicePage = () => {
+  const { user } = useAuth();
+  const isPatient = user?.role_id === 4;
+
   const {
     invoices,
+    myInvoices,
     pendingSummary,
     paidSummary,
     listLoading,
     listError,
     fetchInvoices,
+    fetchMyInvoices,
     fetchSummaries,
     createInvoice,
     updateStatus,
@@ -57,10 +63,14 @@ const InvoicePage = () => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchInvoices();
-    fetchSummaries();
-    loadPatients();
-  }, [fetchInvoices, fetchSummaries]);
+    if (isPatient) {
+      fetchMyInvoices();
+    } else {
+      fetchInvoices();
+      fetchSummaries();
+      loadPatients();
+    }
+  }, [fetchInvoices, fetchMyInvoices, fetchSummaries, isPatient]);
 
   useEffect(() => {
     if (submitSuccess) {
@@ -113,17 +123,22 @@ const InvoicePage = () => {
       title: 'Status',
       dataIndex: 'status',
       key: 'status',
-      render: (status, record) => (
-        <Select 
-            value={status} 
-            onChange={(val) => handleStatusChange(record.id, val)}
-            style={{ width: 120 }}
-            options={[
-                { value: 'pending', label: <Tag color="orange">Pending</Tag> },
-                { value: 'paid', label: <Tag color="green">Paid</Tag> }
-            ]}
-        />
-      )
+      render: (status, record) => {
+        if (isPatient) {
+          return status === 'paid' ? <Tag color="green">Paid</Tag> : <Tag color="orange">Pending</Tag>;
+        }
+        return (
+          <Select 
+              value={status} 
+              onChange={(val) => handleStatusChange(record.id, val)}
+              style={{ width: 120 }}
+              options={[
+                  { value: 'pending', label: <Tag color="orange">Pending</Tag> },
+                  { value: 'paid', label: <Tag color="green">Paid</Tag> }
+              ]}
+          />
+        );
+      }
     },
     {
       title: 'Date',
@@ -137,35 +152,39 @@ const InvoicePage = () => {
     <DashboardLayout>
       <Wrapper>
         <Header>
-          <h2>Billing & Invoices</h2>
-          <Button type="primary" size="large" onClick={() => setIsCreateModalOpen(true)}>
-            Create Invoice
-          </Button>
+          <h2>{isPatient ? 'My Billing' : 'Billing & Invoices'}</h2>
+          {!isPatient && (
+            <Button type="primary" size="large" onClick={() => setIsCreateModalOpen(true)}>
+              Create Invoice
+            </Button>
+          )}
         </Header>
 
-        <Row gutter={24} style={{ marginBottom: 24 }}>
-          <Col span={12}>
-            <StatCard>
-              <h3>Total Pending</h3>
-              <p>${parseFloat(pendingSummary?.pending_amount || 0).toFixed(2)}</p>
-              <span style={{color: '#888', fontSize: 12}}>{pendingSummary?.pending_count || 0} Invoices</span>
-            </StatCard>
-          </Col>
-          <Col span={12}>
-            <StatCard>
-              <h3>Total Paid</h3>
-              <p>${parseFloat(paidSummary?.paid_amount || 0).toFixed(2)}</p>
-              <span style={{color: '#888', fontSize: 12}}>{paidSummary?.paid_count || 0} Invoices</span>
-            </StatCard>
-          </Col>
-        </Row>
+        {!isPatient && (
+          <Row gutter={24} style={{ marginBottom: 24 }}>
+            <Col span={12}>
+              <StatCard>
+                <h3>Total Pending</h3>
+                <p>${parseFloat(pendingSummary?.pending_amount || 0).toFixed(2)}</p>
+                <span style={{color: '#888', fontSize: 12}}>{pendingSummary?.pending_count || 0} Invoices</span>
+              </StatCard>
+            </Col>
+            <Col span={12}>
+              <StatCard>
+                <h3>Total Paid</h3>
+                <p>${parseFloat(paidSummary?.paid_amount || 0).toFixed(2)}</p>
+                <span style={{color: '#888', fontSize: 12}}>{paidSummary?.paid_count || 0} Invoices</span>
+              </StatCard>
+            </Col>
+          </Row>
+        )}
 
         {listError && <Alert type="error" message={listError} style={{ marginBottom: 16 }} />}
 
-        <Card title="All Invoices" style={{ borderRadius: 12 }}>
+        <Card title={isPatient ? 'My Invoices' : 'All Invoices'} style={{ borderRadius: 12 }}>
           <Spin spinning={listLoading || submitting}>
             <Table
-              dataSource={invoices}
+              dataSource={isPatient ? myInvoices : invoices}
               columns={columns}
               rowKey="id"
             />
