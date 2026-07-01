@@ -138,6 +138,12 @@ const LoginPage = () => {
     if (user?.role_id === 3) {
       return <Navigate to="/patients" replace />;
     }
+    if (user?.role_id === 5) {
+      return <Navigate to="/pharmacy" replace />;
+    }
+    if (user?.role_id === 6) {
+      return <Navigate to="/calendar" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 

@@ -457,14 +457,13 @@ const DashboardLayout = ({ children }) => {
   const theme = useTheme();
 
   const menuItems = [
-    ...(user?.role_id !== 4 && user?.role_id !== 3 ? [{ key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' }] : []),
-    ...(user?.role_id === 2 || user?.role_id === 3 ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
-    ...(user?.role_id !== 1 ? [{ key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' }] : []),
-    ...(user?.role_id === 2 || user?.role_id === 4
-    ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }]: []),
-    ...(user?.role_id === 5 ? [{ key: '/pharmacy', icon: <LocalPharmacyIcon />, label: 'Pharmacy' }] : []),
-    ...(user?.role_id === 6 ? [{ key: '/calendar', icon: <CalendarMonthIcon />, label: 'Calendar' }] : []),
-    ...(user?.role_id !== 3 ? [{ key: '/billing', icon: <ReceiptIcon />, label: 'Billing' }] : []),
+    ...([1, 2].includes(user?.role_id) ? [{ key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' }] : []),
+    ...([1, 2, 3].includes(user?.role_id) ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
+    ...([1, 2, 3, 4].includes(user?.role_id) ? [{ key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' }] : []),
+    ...([2, 4].includes(user?.role_id) ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }] : []),
+    ...([5].includes(user?.role_id) ? [{ key: '/pharmacy', icon: <LocalPharmacyIcon />, label: 'Pharmacy' }] : []),
+    ...([6].includes(user?.role_id) ? [{ key: '/calendar', icon: <CalendarMonthIcon />, label: 'Calendar' }] : []),
+    ...([1, 2, 4].includes(user?.role_id) ? [{ key: '/billing', icon: <ReceiptIcon />, label: 'Billing' }] : []),
     ...(user?.role_id === 1 ? [
       { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' },
       { key: '/users', icon: <PeopleIcon />, label: 'Patient Logins' }
@@ -580,7 +579,7 @@ const DashboardLayout = ({ children }) => {
                 </Avatar>
                 <UserDetails>
                   <UserName>{user?.name || 'Doctor'}</UserName>
-                  <UserRole>{user?.role_id === 1 ? 'Admin' : (user?.role_id === 2 ? 'Doctor' : (user?.role_id === 3 ? 'Nurse' : 'Healthcare Pro'))}</UserRole>
+                  <UserRole>{user?.role_id === 1 ? 'Admin' : (user?.role_id === 2 ? 'Doctor' : (user?.role_id === 3 ? 'Nurse' :(user?.role_id === 4 ? 'Patient' :(user?.role_id === 5 ? 'Pharmacist' :(user?.role_id === 6 ? 'Receptionist' :'Healthcare Pro')))))}</UserRole>
                 </UserDetails>
                 <ArrowDropDownIcon style={{ color: theme?.colors?.neutral?.textSecondary || '#64748B', fontSize: 20 }} />
               </UserDropdownWrapper>
