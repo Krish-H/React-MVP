@@ -134,10 +134,14 @@ const CalendarPage = () => {
   const [selectedDate, setSelectedDate] = useState(null);
   const [selectedAppointments, setSelectedAppointments] = useState([]);
 
+  // Re-fetch when month changes
   useEffect(() => {
-    fetchCalendar();
+    fetchCalendar({
+      start_date: currentMonth.startOf('month').format('YYYY-MM-DD'),
+      end_date:   currentMonth.endOf('month').format('YYYY-MM-DD'),
+    });
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [currentMonth]);
 
   const getAppointmentsForDate = (date) => {
     const dateStr = date.format('YYYY-MM-DD');
@@ -205,7 +209,7 @@ const CalendarPage = () => {
                     </DayNumber>
                     {dayApts.slice(0, 2).map((apt) => (
                       <AppointmentDot key={apt.id} $status={apt.status}>
-                        {apt.appointment_time?.slice(0, 5)} · #{apt.patient_id}
+                        {apt.appointment_time?.slice(0, 5)} · {apt.patient_name || `#${apt.patient_id}`}
                       </AppointmentDot>
                     ))}
                     {dayApts.length > 2 && (
@@ -240,7 +244,7 @@ const CalendarPage = () => {
                   }
                   description={
                     <>
-                      <div>Patient #{apt.patient_id} · Provider #{apt.provider_id}</div>
+                      <div>Patient: {apt.patient_name || `#${apt.patient_id}`} · Provider: {apt.provider_name || `#${apt.provider_id}`}</div>
                       <div>Time: {apt.appointment_time}</div>
                       {apt.notes && <div>Notes: {apt.notes}</div>}
                     </>
