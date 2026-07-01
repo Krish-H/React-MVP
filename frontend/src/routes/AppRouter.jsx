@@ -60,8 +60,8 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         >
-          {/* Dashboard is restricted from patients */}
-          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse', 'provider', 'pharmacist', 'receptionist']} />}>
+          {/* Dashboard is restricted from patients and nurses */}
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'provider', 'pharmacist', 'receptionist']} />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
 
@@ -97,9 +97,14 @@ const AppRouter = () => {
             <Route path="/prescriptions/create" element={<CreatePrescription />} />
           </Route>
 
+          {/* Billing accessible to Admin, Provider, Patient */}
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'provider', 'patient']} />}>
+            <Route path="/billing" element={<InvoicePage />} />
+          </Route>
+
           {/* Admin only routes */}
           <Route element={<RoleBasedRoute allowedRoles={['admin']} />}>
-            <Route path="/billing" element={<InvoicePage />} />
+
             <Route path="/staff" element={<StaffManagement />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings/theme" element={<ThemeSettings />} />

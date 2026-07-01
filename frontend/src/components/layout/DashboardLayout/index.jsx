@@ -456,13 +456,13 @@ const DashboardLayout = ({ children }) => {
   const theme = useTheme();
 
   const menuItems = [
-    ...(user?.role_id !== 4 ? [{ key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' }] : []),
+    ...(user?.role_id !== 4 && user?.role_id !== 3 ? [{ key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' }] : []),
     ...(user?.role_id === 2 || user?.role_id === 3 ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
-    { key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' },
+    ...(user?.role_id !== 1 ? [{ key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' }] : []),
     ...(user?.role_id === 2 || user?.role_id === 4
     ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }]: []),
     ...(user?.role_id === 5 ? [{ key: '/pharmacy', icon: <LocalPharmacyIcon />, label: 'Pharmacy' }] : []),
-    { key: '/billing', icon: <ReceiptIcon />, label: 'Billing' },
+    ...(user?.role_id !== 3 ? [{ key: '/billing', icon: <ReceiptIcon />, label: 'Billing' }] : []),
     ...(user?.role_id === 1 ? [
       { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' },
       { key: '/users', icon: <PeopleIcon />, label: 'Patient Logins' }

@@ -11,6 +11,11 @@ const initialState = {
   selectedLoading: false,
   selectedError: null,
 
+  // Patient Users (from users table with role_id=4)
+  patientUsers: [],
+  loadingPatientUsers: false,
+  patientUsersError: null,
+
   // Add / Update
   submitting: false,
   submitError: null,
@@ -53,6 +58,20 @@ const patientSlice = createSlice({
     fetchPatientFailure: (state, action) => {
       state.selectedLoading = false;
       state.selectedError = action.payload;
+    },
+
+    // ── Fetch patient users ───────────────────────────────────
+    fetchPatientUsersRequest: (state) => {
+      state.loadingPatientUsers = true;
+      state.patientUsersError = null;
+    },
+    fetchPatientUsersSuccess: (state, action) => {
+      state.loadingPatientUsers = false;
+      state.patientUsers = action.payload;
+    },
+    fetchPatientUsersFailure: (state, action) => {
+      state.loadingPatientUsers = false;
+      state.patientUsersError = action.payload;
     },
 
     // ── Add patient ───────────────────────────────────────────
@@ -122,6 +141,7 @@ const patientSlice = createSlice({
 export const {
   fetchPatientsRequest, fetchPatientsSuccess, fetchPatientsFailure,
   fetchPatientRequest,  fetchPatientSuccess,  fetchPatientFailure,
+  fetchPatientUsersRequest, fetchPatientUsersSuccess, fetchPatientUsersFailure,
   addPatientRequest,    addPatientSuccess,    addPatientFailure,
   updatePatientRequest, updatePatientSuccess, updatePatientFailure,
   deletePatientRequest, deletePatientSuccess, deletePatientFailure,

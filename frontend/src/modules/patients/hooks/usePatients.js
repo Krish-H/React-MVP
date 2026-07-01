@@ -2,6 +2,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchPatientsRequest,
   fetchPatientRequest,
+  fetchPatientUsersRequest,
   addPatientRequest,
   updatePatientRequest,
   deletePatientRequest,
@@ -20,6 +21,10 @@ export const usePatients = () => {
   const selectedLoading = useSelector((s) => s.patients.selectedLoading);
   const selectedError   = useSelector((s) => s.patients.selectedError);
 
+  const patientUsers        = useSelector((s) => s.patients.patientUsers);
+  const loadingPatientUsers = useSelector((s) => s.patients.loadingPatientUsers);
+  const patientUsersError   = useSelector((s) => s.patients.patientUsersError);
+
   const submitting    = useSelector((s) => s.patients.submitting);
   const submitError   = useSelector((s) => s.patients.submitError);
   const submitSuccess = useSelector((s) => s.patients.submitSuccess);
@@ -32,12 +37,14 @@ export const usePatients = () => {
     // State
     list, listLoading, listError,
     selected, selectedLoading, selectedError,
+    patientUsers, loadingPatientUsers, patientUsersError,
     submitting, submitError, submitSuccess,
     deleting, deleteError, deleteSuccess,
 
     // Actions
     fetchPatients:  ()         => dispatch(fetchPatientsRequest()),
     fetchPatient:   (id)       => dispatch(fetchPatientRequest(id)),
+    fetchPatientUsers: ()      => dispatch(fetchPatientUsersRequest()),
     addPatient:     (data)     => dispatch(addPatientRequest(data)),
     updatePatient:  (id, data) => dispatch(updatePatientRequest({ id, ...data })),
     deletePatient:  (id)       => dispatch(deletePatientRequest(id)),

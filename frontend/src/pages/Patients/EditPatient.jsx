@@ -90,15 +90,20 @@ const EditPatient = () => {
 
   // Map backend field names → form field names
   const initialValues = patient ? {
-    name:       patient.name,
+    patient_user_id: patient.patient_user_id || patient.user_id || patient.id, // Fallback if patient_user_id isn't explicitly returned
     gender:     patient.gender,
     blood:      patient.blood_group,
     phone:      patient.phone,
-    email:      patient.email,
     address:    patient.address,
     conditions: patient.medical_history,
     emergency:  patient.emergency_contact,
   } : {};
+
+  const patientUsers = patient ? [{
+    id: patient.patient_user_id || patient.user_id || patient.id,
+    name: patient.name || (patient.user && patient.user.name),
+    email: patient.email || (patient.user && patient.user.email),
+  }] : [];
 
   return (
     <DashboardLayout>
@@ -123,6 +128,8 @@ const EditPatient = () => {
           submitLabel="Update Patient"
           onSubmit={handleSubmit}
           loading={submitting}
+          patientUsers={patientUsers}
+          isEdit={true}
         />
       </PageWrapper>
     </DashboardLayout>

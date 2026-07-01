@@ -1,5 +1,5 @@
 import React from 'react';
-import { Form, Input, Select, DatePicker, Button } from 'antd';
+import { Form, Input, Select, DatePicker, Button, Spin, Empty } from 'antd';
 import styled from 'styled-components';
 import SaveIcon from '@mui/icons-material/Save';
 import CancelIcon from '@mui/icons-material/Cancel';
@@ -66,7 +66,15 @@ const CancelBtn = styled(Button)`
   font-weight: 600;
 `;
 
-const PatientForm = ({ initialValues = {}, onSubmit, submitLabel = 'Save Patient', loading = false }) => {
+const PatientForm = ({ 
+  initialValues = {}, 
+  onSubmit, 
+  submitLabel = 'Save Patient', 
+  loading = false,
+  patientUsers = [],
+  loadingPatientUsers = false,
+  isEdit = false
+}) => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
@@ -90,11 +98,31 @@ const PatientForm = ({ initialValues = {}, onSubmit, submitLabel = 'Save Patient
           <SectionTitle>Personal Information</SectionTitle>
 
           <Form.Item
-            name="name"
-            label={<FormLabel>Full Name</FormLabel>}
-            rules={[{ required: true, message: 'Full name is required' }]}
+            name="patient_user_id"
+            label={<FormLabel>Patient User *</FormLabel>}
+            rules={[{ required: true, message: 'Patient User is required' }]}
           >
-            <StyledInput placeholder="e.g. John Doe" />
+            {loadingPatientUsers ? (
+              <Spin size="small" style={{ width: '100%', padding: '8px 0' }} />
+            ) : patientUsers.length === 0 && !isEdit ? (
+              <Empty
+                image={Empty.PRESENTED_IMAGE_SIMPLE}
+                description="No available patient accounts. Please create a Patient user from User Management first."
+              />
+            ) : (
+              <StyledSelect
+                showSearch
+                placeholder="Select Patient User"
+                disabled={isEdit}
+                filterOption={(input, option) =>
+                  (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
+                }
+                options={patientUsers.map((user) => ({
+                  value: user.id,
+                  label: `${user.name} (${user.email})`,
+                }))}
+              />
+            )}
           </Form.Item>
 
           <Form.Item
@@ -136,13 +164,7 @@ const PatientForm = ({ initialValues = {}, onSubmit, submitLabel = 'Save Patient
             <StyledInput placeholder="e.g. 9876543210" />
           </Form.Item>
 
-          <Form.Item
-            name="email"
-            label={<FormLabel>Email</FormLabel>}
-            rules={[{ type: 'email', message: 'Enter a valid email' }]}
-          >
-            <StyledInput placeholder="e.g. john@email.com" />
-          </Form.Item>
+
 
           <FormFullRow>
             <Form.Item name="address" label={<FormLabel>Address</FormLabel>}>
