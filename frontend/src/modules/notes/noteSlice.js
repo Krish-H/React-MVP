@@ -67,7 +67,7 @@ const noteSlice = createSlice({
       state.submitSuccess = true;
 
       state.notes = state.notes.map((n) =>
-        n.id === action.payload.id ? action.payload : n
+        n.id === action.payload.id ? { ...n, ...action.payload } : n
       );
     },
     updateNoteFailure: (state, action) => {

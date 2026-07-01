@@ -130,6 +130,7 @@ const AppointmentDetails = () => {
     if (id) {
       fetchNotes(id);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
   useEffect(() => {
     getAppointment(id);
@@ -187,6 +188,31 @@ const AppointmentDetails = () => {
       message.error('Delete failed');
     }
   };
+
+  // Sort notes by created_at descending (latest first)
+  const sortedNotes = [...(notes || [])].sort((a, b) => {
+    const timeA = a?.created_at ? new Date(a.created_at).getTime() : 0;
+    const timeB = b?.created_at ? new Date(b.created_at).getTime() : 0;
+    if (!isNaN(timeA) && !isNaN(timeB) && timeA !== timeB) {
+      return timeB - timeA;
+    }
+    return (b?.id || 0) > (a?.id || 0) ? 1 : -1;
+  });
+
+  const latestNote = sortedNotes[0];
+  const currentNoteText = latestNote ? latestNote.note : (appt?.notes || 'No notes yet');
+
+  // History list includes all notes and the initial note if it exists
+  const historyNotes = [...sortedNotes];
+  if (appt?.notes) {
+    historyNotes.push({
+      id: 'initial',
+      note: appt.notes,
+      created_at: appt.created_at || (appt.appointment_date && appt.appointment_time ? `${appt.appointment_date}T${appt.appointment_time}` : new Date().toISOString()),
+      isInitial: true,
+    });
+  }
+
   if (loading) {
     return (
       <DashboardLayout>
@@ -260,7 +286,7 @@ const AppointmentDetails = () => {
 
           <div style={{ marginTop: 10 }}>
             <strong>Current Note:</strong>
-            <p>{appt?.notes || 'No notes yet'}</p>
+            <p>{currentNoteText}</p>
           </div>
         </Card>
         <Drawer
@@ -292,10 +318,10 @@ const AppointmentDetails = () => {
 
           <List
             loading={notesLoading}
-            dataSource={notes}
+            dataSource={historyNotes}
             renderItem={(item) => (
               <List.Item
-                actions={[
+                actions={item.isInitial ? [] : [
                   <a
                     onClick={() => {
                       setEditingNote(item);
@@ -316,7 +342,9 @@ const AppointmentDetails = () => {
                 <List.Item.Meta
                   title={
                     <div>
-                      <Tag color="blue">Doctor/Nurse</Tag>{' '}
+                      <Tag color={item.isInitial ? 'gold' : 'blue'}>
+                        {item.isInitial ? 'Initial Note' : 'Doctor/Nurse'}
+                      </Tag>{' '}
                       {dayjs(item.created_at).format('DD MMM YYYY HH:mm')}
                     </div>
                   }
