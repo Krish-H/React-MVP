@@ -153,6 +153,7 @@ const RegisterPage = () => {
 
   const { loading, error, registrationSuccess, tenantDetails } = useSelector((state) => state.tenant);
   const isAuthenticated = useSelector((state) => state.auth.isAuthenticated);
+  const authUser = useSelector((state) => state.auth.user);
 
   const queryParams = new URLSearchParams(location.search);
   const plan = queryParams.get('plan') || 'basic';
@@ -164,6 +165,12 @@ const RegisterPage = () => {
   }, [dispatch]);
 
   if (isAuthenticated) {
+    if (authUser?.role_id === 4) {
+      return <Navigate to="/appointments" replace />;
+    }
+    if (authUser?.role_id === 3) {
+      return <Navigate to="/patients" replace />;
+    }
     return <Navigate to="/dashboard" replace />;
   }
 

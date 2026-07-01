@@ -192,17 +192,6 @@ const PatientDetails = () => {
           </DetailGrid>
         </SectionWrapper>
 
-        {/* Appointment History (dummy for now) */}
-        <SectionWrapper>
-          <SectionTitle style={{ gridColumn: 'unset' }}>Appointment History</SectionTitle>
-          <Table
-            columns={apptColumns}
-            dataSource={dummyAppointments}
-            rowKey="date"
-            pagination={false}
-            size="small"
-          />
-        </SectionWrapper>
       </PageWrapper>
     </DashboardLayout>
   );
