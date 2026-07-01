@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Tag, Spin, Alert, Button, message, Select } from 'antd';
 import styled from 'styled-components';
@@ -6,9 +6,6 @@ import ArrowBackIcon from '@mui/icons-material/ArrowBack';
 import EventIcon from '@mui/icons-material/Event';
 import DashboardLayout from '../../components/layout/DashboardLayout';
 import { useAppointments } from '../../modules/appointment/hooks/useAppointments';
-import { useNotes } from '../../modules/notes/hooks/useNotes';
-import { Drawer, List, Input, Popconfirm } from 'antd';
-import dayjs from 'dayjs';
 
 const PageWrapper = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
@@ -114,27 +111,9 @@ const AppointmentDetails = () => {
     submitting, submitSuccess, submitError, resetSubmit,
   } = useAppointments();
 
-  const {
-    notes,
-    loading: notesLoading,
-    fetchNotes,
-    createNote,
-    updateNote,
-    deleteNote,
-  } = useNotes();
-
-  const [noteDrawerOpen, setNoteDrawerOpen] = useState(false);
-  const [editingNote, setEditingNote] = useState(null);
-  const [noteText, setNoteText] = useState('');
-  useEffect(() => {
-    if (id) {
-      fetchNotes(id);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [id]);
   useEffect(() => {
     getAppointment(id);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [id]);
 
   useEffect(() => {
@@ -143,7 +122,7 @@ const AppointmentDetails = () => {
       resetSubmit();
       getAppointment(id);
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitSuccess]);
 
   useEffect(() => {
@@ -151,67 +130,12 @@ const AppointmentDetails = () => {
       message.error(submitError);
       resetSubmit();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [submitError]);
 
   const handleStatusChange = (status) => {
     updateAppointment(id, { status });
   };
-  const handleSaveNote = async () => {
-    if (!noteText.trim()) {
-      message.error('Note cannot be empty');
-      return;
-    }
-
-    try {
-      if (editingNote) {
-        await updateNote(editingNote.id, { note: noteText });
-        message.success('Note updated');
-      } else {
-        await createNote(id, { note: noteText });
-        message.success('Note added');
-      }
-
-      setNoteText('');
-      setEditingNote(null);
-      fetchNotes(id);
-    } catch (err) {
-      message.error('Failed to save note');
-    }
-  };
-  const handleDeleteNote = async (noteId) => {
-    try {
-      await deleteNote(noteId);
-      message.success('Note deleted');
-      fetchNotes(id);
-    } catch (err) {
-      message.error('Delete failed');
-    }
-  };
-
-  // Sort notes by created_at descending (latest first)
-  const sortedNotes = [...(notes || [])].sort((a, b) => {
-    const timeA = a?.created_at ? new Date(a.created_at).getTime() : 0;
-    const timeB = b?.created_at ? new Date(b.created_at).getTime() : 0;
-    if (!isNaN(timeA) && !isNaN(timeB) && timeA !== timeB) {
-      return timeB - timeA;
-    }
-    return (b?.id || 0) > (a?.id || 0) ? 1 : -1;
-  });
-
-  const latestNote = sortedNotes[0];
-  const currentNoteText = latestNote ? latestNote.note : (appt?.notes || 'No notes yet');
-
-  // History list includes all notes and the initial note if it exists
-  const historyNotes = [...sortedNotes];
-  if (appt?.notes) {
-    historyNotes.push({
-      id: 'initial',
-      note: appt.notes,
-      created_at: appt.created_at || (appt.appointment_date && appt.appointment_time ? `${appt.appointment_date}T${appt.appointment_time}` : new Date().toISOString()),
-      isInitial: true,
-    });
-  }
 
   if (loading) {
     return (
@@ -274,86 +198,13 @@ const AppointmentDetails = () => {
               <DetailLabel>Time</DetailLabel>
               <DetailValue>{appt.appointment_time}</DetailValue>
             </DetailItem>
+            <DetailItem style={{ gridColumn: '1 / -1' }}>
+              <DetailLabel>Notes</DetailLabel>
+              <DetailValue>{appt.notes || '—'}</DetailValue>
+            </DetailItem>
           </Grid>
         </Card>
-        <Card style={{ marginTop: 16 }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-            <h3>Notes</h3>
-            <Button type="primary" onClick={() => setNoteDrawerOpen(true)}>
-              Add / View Notes
-            </Button>
-          </div>
 
-          <div style={{ marginTop: 10 }}>
-            <strong>Current Note:</strong>
-            <p>{currentNoteText}</p>
-          </div>
-        </Card>
-        <Drawer
-          title="Appointment Notes History"
-          open={noteDrawerOpen}
-          onClose={() => {
-            setNoteDrawerOpen(false);
-            setEditingNote(null);
-            setNoteText('');
-          }}
-          width={500}
-        >
-          <div style={{ marginBottom: 16 }}>
-            <Input.TextArea
-              rows={4}
-              value={noteText}
-              onChange={(e) => setNoteText(e.target.value)}
-              placeholder="Write note..."
-            />
-
-            <Button
-              type="primary"
-              onClick={handleSaveNote}
-              style={{ marginTop: 10 }}
-            >
-              {editingNote ? 'Update Note' : 'Add Note'}
-            </Button>
-          </div>
-
-          <List
-            loading={notesLoading}
-            dataSource={historyNotes}
-            renderItem={(item) => (
-              <List.Item
-                actions={item.isInitial ? [] : [
-                  <a
-                    onClick={() => {
-                      setEditingNote(item);
-                      setNoteText(item.note);
-                    }}
-                  >
-                    Edit
-                  </a>,
-
-                  <Popconfirm
-                    title="Delete note?"
-                    onConfirm={() => handleDeleteNote(item.id)}
-                  >
-                    <a style={{ color: 'red' }}>Delete</a>
-                  </Popconfirm>,
-                ]}
-              >
-                <List.Item.Meta
-                  title={
-                    <div>
-                      <Tag color={item.isInitial ? 'gold' : 'blue'}>
-                        {item.isInitial ? 'Initial Note' : 'Doctor/Nurse'}
-                      </Tag>{' '}
-                      {dayjs(item.created_at).format('DD MMM YYYY HH:mm')}
-                    </div>
-                  }
-                  description={item.note}
-                />
-              </List.Item>
-            )}
-          />
-        </Drawer>
         {/* Status Update */}
         {appt.status !== 'cancelled' && (
           <Card>
