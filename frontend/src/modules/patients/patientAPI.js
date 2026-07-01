@@ -5,6 +5,9 @@ export const patientAPI = {
   getAll: () =>
     apiService.get(apiEndpoints.patients.list),
 
+  getPatientUsers: () =>
+    apiService.get('/patient-users'),
+
   getById: (id) =>
     apiService.get(apiEndpoints.patients.detail(id)),
 
