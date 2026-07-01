@@ -130,10 +130,13 @@ const LoginPage = () => {
   const navigate = useNavigate();
   const [form] = Form.useForm();
 
-  // Already logged in → redirect
+  // Already logged in → redirect to a page this role can access
   if (isAuthenticated) {
     if (user?.role_id === 4) {
       return <Navigate to="/appointments" replace />;
+    }
+    if (user?.role_id === 3) {
+      return <Navigate to="/patients" replace />;
     }
     return <Navigate to="/dashboard" replace />;
   }

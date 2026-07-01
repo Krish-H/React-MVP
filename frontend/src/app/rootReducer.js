@@ -6,6 +6,7 @@ import patientReducer from '../modules/patients/patientSlice';
 import staffReducer from '../modules/staff/staffSlice';
 import appointmentReducer from '../modules/appointment/appointmentSlice';
 import prescriptionReducer from '../modules/prescription/prescriptionSlice';
+import calendarReducer from '../modules/calendar/calendarSlice';
 import billingReducer from '../modules/billing/billingSlice';
 
 const rootReducer = combineReducers({
@@ -16,6 +17,7 @@ const rootReducer = combineReducers({
   staff: staffReducer,
   appointments: appointmentReducer,
   prescription: prescriptionReducer,
+  calendar: calendarReducer,
   billing: billingReducer,
 });
 
