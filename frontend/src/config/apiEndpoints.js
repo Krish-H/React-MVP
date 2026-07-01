@@ -30,7 +30,7 @@ export const apiEndpoints = {
     deactivate: (id) => `/staff/${id}/deactivate`,
   },
   appointments: {
-    list: '/appointments',
+    list:   '/appointments',
     create: '/appointments',
     detail: (id) => `/appointments/${id}`,
     update: (id) => `/appointments/${id}`,
@@ -47,12 +47,6 @@ export const apiEndpoints = {
     updateStatus: (id) => `/prescriptions/${id}/status`,
     verify:       (id) => `/prescriptions/${id}/verify`,
     dispense:     (id) => `/prescriptions/${id}/dispense`,
-  },
-  notes: {
-    list: (appointmentId) => `/appointments/${appointmentId}/notes`,
-    create: (appointmentId) => `/appointments/${appointmentId}/notes`,
-    update: (id) => `/notes/${id}`,
-    delete: (id) => `/notes/${id}`,
   },
   billing: {
     list: '/invoices',
