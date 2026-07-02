@@ -112,7 +112,7 @@ const TrendBadge = styled.span`
   }
 `;
 
-const StatsCard = ({ title, value, icon, color = 'info', trend = '+12%', trendType = 'up', trendLabel = 'vs last month' }) => {
+const StatsCard = React.memo(({ title, value, icon, color = 'info', trend = '+12%', trendType = 'up', trendLabel = 'vs last month' }) => {
   const isUp = trendType === 'up';
 
   return (
@@ -134,6 +134,6 @@ const StatsCard = ({ title, value, icon, color = 'info', trend = '+12%', trendTy
       </TrendRow>
     </StyledCard>
   );
-};
+});
 
 export default StatsCard;

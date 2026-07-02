@@ -105,7 +105,7 @@ const ActionBtn = styled.button`
   svg { font-size: 15px; }
 `;
 
-const PatientCard = ({ data }) => {
+const PatientCard = React.memo(({ data }) => {
   const navigate = useNavigate();
 
   return (
@@ -144,6 +144,6 @@ const PatientCard = ({ data }) => {
       ))}
     </CardGrid>
   );
-};
+});
 
 export default PatientCard;

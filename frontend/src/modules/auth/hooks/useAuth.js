@@ -1,3 +1,4 @@
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { loginRequest, logoutRequest, changePasswordRequest } from '../authSlice';
 import { selectAuthUser, selectIsAuthenticated, selectAuthLoading, selectUserRole } from '../selectors';
@@ -10,19 +11,19 @@ export const useAuth = () => {
   const loading = useSelector(selectAuthLoading);
   const role = useSelector(selectUserRole);
 
-  const login = (credentials) => {
+  const login = useCallback((credentials) => {
     dispatch(loginRequest(credentials));
-  };
+  }, [dispatch]);
 
-  const logout = () => {
+  const logout = useCallback(() => {
     dispatch(logoutRequest());
-  };
+  }, [dispatch]);
 
-  const changePassword = (passwordData) => {
+  const changePassword = useCallback((passwordData) => {
     dispatch(changePasswordRequest(passwordData));
-  };
+  }, [dispatch]);
 
-  return {
+  return useMemo(() => ({
     user,
     isAuthenticated,
     role,
@@ -30,5 +31,5 @@ export const useAuth = () => {
     login,
     logout,
     changePassword
-  };
+  }), [user, isAuthenticated, role, loading, login, logout, changePassword]);
 };

@@ -31,7 +31,7 @@ const ActionsCell = styled.div`
   gap: 4px;
 `;
 
-const PatientTable = ({ data, onDelete }) => {
+const PatientTable = React.memo(({ data, onDelete }) => {
   const navigate = useNavigate();
 
   const columns = [
@@ -119,6 +119,6 @@ const PatientTable = ({ data, onDelete }) => {
       size="middle"
     />
   );
-};
+});
 
 export default PatientTable;

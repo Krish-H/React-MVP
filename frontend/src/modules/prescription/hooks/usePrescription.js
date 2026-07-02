@@ -1,18 +1,17 @@
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectPrescriptionState } from '../selectors';
 
 import {
   fetchPrescriptionsRequest,
   fetchPrescriptionRequest,
-
   createPrescriptionRequest,
   updatePrescriptionRequest,
-
   addItemRequest,
   updateItemRequest,
   deleteItemRequest,
-
   updateStatusRequest,
-   verifyPrescriptionRequest,
+  verifyPrescriptionRequest,
   dispensePrescriptionRequest,
 } from '../prescriptionSlice';
 
@@ -20,74 +19,66 @@ export const usePrescription = () => {
   const dispatch = useDispatch();
 
   // ---------------- STATE ----------------
-  const prescriptions = useSelector((s) => s.prescription.prescriptions);
-  const listLoading = useSelector((s) => s.prescription.listLoading);
-  const listError = useSelector((s) => s.prescription.listError);
-
-  const selectedPrescription = useSelector(
-    (s) => s.prescription.selectedPrescription
-  );
-  const selectedLoading = useSelector((s) => s.prescription.selectedLoading);
-  const selectedError = useSelector((s) => s.prescription.selectedError);
-
-  const submitting = useSelector((s) => s.prescription.submitting);
-  const submitError = useSelector((s) => s.prescription.submitError);
-  const submitSuccess = useSelector((s) => s.prescription.submitSuccess);
-
-  const itemLoading = useSelector((s) => s.prescription.itemLoading);
-  const itemError = useSelector((s) => s.prescription.itemError);
-
-  const statusLoading = useSelector((s) => s.prescription.statusLoading);
-  const statusError = useSelector((s) => s.prescription.statusError);
+  const {
+    prescriptions,
+    listLoading,
+    listError,
+    selectedPrescription,
+    selectedLoading,
+    selectedError,
+    submitting,
+    submitError,
+    submitSuccess,
+    itemLoading,
+    itemError,
+    statusLoading,
+    statusError
+  } = useSelector(selectPrescriptionState);
 
   // ---------------- ACTIONS ----------------
-  const fetchPrescriptions = () =>
-    dispatch(fetchPrescriptionsRequest());
+  const fetchPrescriptions = useCallback(() =>
+    dispatch(fetchPrescriptionsRequest()), [dispatch]);
 
-  const fetchPrescription = (id) =>
-    dispatch(fetchPrescriptionRequest(id));
+  const fetchPrescription = useCallback((id) =>
+    dispatch(fetchPrescriptionRequest(id)), [dispatch]);
 
-  const createPrescription = (data) =>
-    dispatch(createPrescriptionRequest(data));
+  const createPrescription = useCallback((data) =>
+    dispatch(createPrescriptionRequest(data)), [dispatch]);
 
-  const updatePrescription = (id, data) =>
-    dispatch(updatePrescriptionRequest({ id, data }));
+  const updatePrescription = useCallback((id, data) =>
+    dispatch(updatePrescriptionRequest({ id, data })), [dispatch]);
 
-  const addItem = (id, data) =>
-    dispatch(addItemRequest({ id, data }));
+  const addItem = useCallback((id, data) =>
+    dispatch(addItemRequest({ id, data })), [dispatch]);
 
-  const updateItem = (id, itemId, data) =>
-    dispatch(updateItemRequest({ id, itemId, data }));
+  const updateItem = useCallback((id, itemId, data) =>
+    dispatch(updateItemRequest({ id, itemId, data })), [dispatch]);
 
-  const deleteItem = (id, itemId) =>
-    dispatch(deleteItemRequest({ id, itemId }));
+  const deleteItem = useCallback((id, itemId) =>
+    dispatch(deleteItemRequest({ id, itemId })), [dispatch]);
 
-  const updateStatus = (id, status) =>
-    dispatch(updateStatusRequest({ id, status }));
+  const updateStatus = useCallback((id, status) =>
+    dispatch(updateStatusRequest({ id, status })), [dispatch]);
 
-  const verifyPrescription = (id) =>
-  dispatch(verifyPrescriptionRequest(id));
+  const verifyPrescription = useCallback((id) =>
+    dispatch(verifyPrescriptionRequest(id)), [dispatch]);
 
-  const dispensePrescription = (id) =>
-  dispatch(dispensePrescriptionRequest(id));
+  const dispensePrescription = useCallback((id) =>
+    dispatch(dispensePrescriptionRequest(id)), [dispatch]);
 
-  return {
+  return useMemo(() => ({
     // STATE
     prescriptions,
     listLoading,
     listError,
-
     selectedPrescription,
     selectedLoading,
     selectedError,
-
     submitting,
     submitError,
     submitSuccess,
-
     itemLoading,
     itemError,
-
     statusLoading,
     statusError,
 
@@ -100,9 +91,31 @@ export const usePrescription = () => {
     updateItem,
     deleteItem,
     updateStatus,
-    
     verifyPrescription,
     dispensePrescription,
-
-  };
+  }), [
+    prescriptions,
+    listLoading,
+    listError,
+    selectedPrescription,
+    selectedLoading,
+    selectedError,
+    submitting,
+    submitError,
+    submitSuccess,
+    itemLoading,
+    itemError,
+    statusLoading,
+    statusError,
+    fetchPrescriptions,
+    fetchPrescription,
+    createPrescription,
+    updatePrescription,
+    addItem,
+    updateItem,
+    deleteItem,
+    updateStatus,
+    verifyPrescription,
+    dispensePrescription
+  ]);
 };

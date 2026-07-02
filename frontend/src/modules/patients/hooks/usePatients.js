@@ -1,4 +1,6 @@
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
+import { selectPatientsState } from '../selectors';
 import {
   fetchPatientsRequest,
   fetchPatientRequest,
@@ -13,27 +15,39 @@ import {
 export const usePatients = () => {
   const dispatch = useDispatch();
 
-  const list           = useSelector((s) => s.patients.list);
-  const listLoading    = useSelector((s) => s.patients.listLoading);
-  const listError      = useSelector((s) => s.patients.listError);
+  const {
+    list, listLoading, listError,
+    selected, selectedLoading, selectedError,
+    patientUsers, loadingPatientUsers, patientUsersError,
+    submitting, submitError, submitSuccess,
+    deleting, deleteError, deleteSuccess
+  } = useSelector(selectPatientsState);
 
-  const selected        = useSelector((s) => s.patients.selected);
-  const selectedLoading = useSelector((s) => s.patients.selectedLoading);
-  const selectedError   = useSelector((s) => s.patients.selectedError);
+  const fetchPatients = useCallback(() => 
+    dispatch(fetchPatientsRequest()), [dispatch]);
+    
+  const fetchPatient = useCallback((id) => 
+    dispatch(fetchPatientRequest(id)), [dispatch]);
+    
+  const fetchPatientUsers = useCallback(() => 
+    dispatch(fetchPatientUsersRequest()), [dispatch]);
+    
+  const addPatient = useCallback((data) => 
+    dispatch(addPatientRequest(data)), [dispatch]);
+    
+  const updatePatient = useCallback((id, data) => 
+    dispatch(updatePatientRequest({ id, ...data })), [dispatch]);
+    
+  const deletePatient = useCallback((id) => 
+    dispatch(deletePatientRequest(id)), [dispatch]);
+    
+  const resetSubmit = useCallback(() => 
+    dispatch(resetPatientSubmit()), [dispatch]);
+    
+  const resetDelete = useCallback(() => 
+    dispatch(resetPatientDelete()), [dispatch]);
 
-  const patientUsers        = useSelector((s) => s.patients.patientUsers);
-  const loadingPatientUsers = useSelector((s) => s.patients.loadingPatientUsers);
-  const patientUsersError   = useSelector((s) => s.patients.patientUsersError);
-
-  const submitting    = useSelector((s) => s.patients.submitting);
-  const submitError   = useSelector((s) => s.patients.submitError);
-  const submitSuccess = useSelector((s) => s.patients.submitSuccess);
-
-  const deleting      = useSelector((s) => s.patients.deleting);
-  const deleteError   = useSelector((s) => s.patients.deleteError);
-  const deleteSuccess = useSelector((s) => s.patients.deleteSuccess);
-
-  return {
+  return useMemo(() => ({
     // State
     list, listLoading, listError,
     selected, selectedLoading, selectedError,
@@ -42,13 +56,23 @@ export const usePatients = () => {
     deleting, deleteError, deleteSuccess,
 
     // Actions
-    fetchPatients:  ()         => dispatch(fetchPatientsRequest()),
-    fetchPatient:   (id)       => dispatch(fetchPatientRequest(id)),
-    fetchPatientUsers: ()      => dispatch(fetchPatientUsersRequest()),
-    addPatient:     (data)     => dispatch(addPatientRequest(data)),
-    updatePatient:  (id, data) => dispatch(updatePatientRequest({ id, ...data })),
-    deletePatient:  (id)       => dispatch(deletePatientRequest(id)),
-    resetSubmit:    ()         => dispatch(resetPatientSubmit()),
-    resetDelete:    ()         => dispatch(resetPatientDelete()),
-  };
+    fetchPatients,
+    fetchPatient,
+    fetchPatientUsers,
+    addPatient,
+    updatePatient,
+    deletePatient,
+    resetSubmit,
+    resetDelete,
+  }), [
+    list, listLoading, listError,
+    selected, selectedLoading, selectedError,
+    patientUsers, loadingPatientUsers, patientUsersError,
+    submitting, submitError, submitSuccess,
+    deleting, deleteError, deleteSuccess,
+    fetchPatients, fetchPatient, fetchPatientUsers,
+    addPatient, updatePatient, deletePatient,
+    resetSubmit, resetDelete
+  ]);
 };
+

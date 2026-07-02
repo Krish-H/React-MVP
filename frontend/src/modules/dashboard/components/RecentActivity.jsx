@@ -116,7 +116,7 @@ const TimeText = styled(Text)`
   }
 `;
 
-const RecentActivity = () => {
+const RecentActivity = React.memo(() => {
   const activities = [
     {
       id: 1,
@@ -172,6 +172,6 @@ const RecentActivity = () => {
       <ActivityTimeline items={timelineItems} />
     </StyledCard>
   );
-};
+});
 
 export default RecentActivity;
