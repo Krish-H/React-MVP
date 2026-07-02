@@ -1,5 +1,4 @@
 import axiosClient from './axiosClient';
-import { encryptionService } from './encryptionService';
 
 export const apiService = {
   get: async (url, config = {}) => {
@@ -9,14 +8,12 @@ export const apiService = {
   },
   
   post: async (url, data, config = {}) => {
-    const encryptedPayload = encryptionService.encryptPayload(data);
-    const response = await axiosClient.post(url, encryptedPayload, config);
+    const response = await axiosClient.post(url, data, config);
     return response.data;
   },
   
   put: async (url, data, config = {}) => {
-    const encryptedPayload = encryptionService.encryptPayload(data);
-    const response = await axiosClient.put(url, encryptedPayload, config);
+    const response = await axiosClient.put(url, data, config);
     return response.data;
   },
   
@@ -26,8 +23,7 @@ export const apiService = {
   },
 
   patch: async (url, data, config = {}) => {
-    const encryptedPayload = encryptionService.encryptPayload(data);
-    const response = await axiosClient.patch(url, encryptedPayload, config);
+    const response = await axiosClient.patch(url, data, config);
     return response.data;
   }
 };
