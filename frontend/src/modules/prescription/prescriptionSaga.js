@@ -1,5 +1,8 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { prescriptionAPI } from './prescriptionAPI';
+import { apiEndpoints } from '../../config/apiEndpoints';
+import { withOfflineQueue } from '../offline/offlineSaga';
+import { v4 as uuidv4 } from 'uuid';
 import {verifyPrescriptionRequest,dispensePrescriptionRequest} from './prescriptionSlice';
 
 import {
@@ -73,11 +76,16 @@ function* handleFetchPrescription(action) {
 // ---------------- CREATE ----------------
 function* handleCreatePrescription(action) {
   try {
-    const response = yield call(
-      prescriptionAPI.create,
-      action.payload
-    );
+    const response = yield call(withOfflineQueue, {
+      method: 'post',
+      endpoint: apiEndpoints.prescriptions.create,
+      data: action.payload
+    });
 
+    if (response.offlineQueued) {
+      yield put(createPrescriptionSuccess({ offlineQueued: true }));
+      return;
+    }
     yield put(createPrescriptionSuccess(response.prescription || response));
   } catch (error) {
     yield put(
@@ -94,13 +102,17 @@ function* handleUpdatePrescription(action) {
   try {
     const { id, data } = action.payload;
 
-    const response = yield call(
-      prescriptionAPI.update,
-      id,
+    const response = yield call(withOfflineQueue, {
+      method: 'put',
+      endpoint: apiEndpoints.prescriptions.update(id),
       data
-    );
+    });
 
-    yield put(updatePrescriptionSuccess(response.prescription || response));
+    if (response.offlineQueued) {
+      yield put(updatePrescriptionSuccess({ offlineQueued: true }));
+      return;
+    }
+    yield put(updatePrescriptionSuccess({ id, ...data }));
   } catch (error) {
     yield put(
       updatePrescriptionFailure(
@@ -116,13 +128,17 @@ function* handleAddItem(action) {
   try {
     const { id, data } = action.payload;
 
-    const response = yield call(
-      prescriptionAPI.addItem,
-      id,
+    const response = yield call(withOfflineQueue, {
+      method: 'post',
+      endpoint: apiEndpoints.prescriptions.addItem(id),
       data
-    );
+    });
 
-    yield put(addItemSuccess(response.item || response));
+    if (response.offlineQueued) {
+      yield put(addItemSuccess({ offlineQueued: true }));
+      return;
+    }
+    yield put(addItemSuccess({ id: response.item_id, ...data }));
   } catch (error) {
     yield put(
       addItemFailure(error.message || 'Failed to add medicine item')
@@ -136,17 +152,20 @@ function* handleUpdateItem(action) {
   try {
     const { id, itemId, data } = action.payload;
 
-    const response = yield call(
-      prescriptionAPI.updateItem,
-      id,
-      itemId,
+    const response = yield call(withOfflineQueue, {
+      method: 'put',
+      endpoint: apiEndpoints.prescriptions.updateItem(id, itemId),
       data
-    );
+    });
 
+    if (response.offlineQueued) {
+      yield put(updateItemSuccess({ offlineQueued: true }));
+      return;
+    }
     yield put(
       updateItemSuccess({
         itemId,
-        updatedItem: response.item || response,
+        updatedItem: { id: itemId, ...data },
       })
     );
   } catch (error) {
@@ -162,11 +181,10 @@ function* handleDeleteItem(action) {
   try {
     const { id, itemId } = action.payload;
 
-    yield call(
-      prescriptionAPI.deleteItem,
-      id,
-      itemId
-    );
+    yield call(withOfflineQueue, {
+      method: 'delete',
+      endpoint: apiEndpoints.prescriptions.deleteItem(id, itemId)
+    });
 
     yield put(deleteItemSuccess(itemId));
   } catch (error) {
@@ -182,16 +200,16 @@ function* handleUpdateStatus(action) {
   try {
     const { id, status } = action.payload;
 
-    const response = yield call(
-      prescriptionAPI.updateStatus,
-      id,
-      status
-    );
+    const response = yield call(withOfflineQueue, {
+      method: 'patch',
+      endpoint: apiEndpoints.prescriptions.updateStatus(id),
+      data: { status }
+    });
 
     yield put(updateStatusSuccess({
       id,
       status,
-      data: response,
+      data: response.offlineQueued ? {} : response,
     }));
   } catch (error) {
     yield put(
@@ -202,15 +220,15 @@ function* handleUpdateStatus(action) {
 
 function* handleVerifyPrescription(action) {
   try {
-    const response = yield call(
-      prescriptionAPI.verify,
-      action.payload
-    );
+    const response = yield call(withOfflineQueue, {
+      method: 'patch',
+      endpoint: apiEndpoints.prescriptions.verify(action.payload)
+    });
 
     yield put(updateStatusSuccess({
       id: action.payload,
       status: 'VERIFIED',
-      data: response,
+      data: response.offlineQueued ? {} : response,
     }));
   } catch (error) {
     yield put(updateStatusFailure(error.message));
@@ -219,15 +237,15 @@ function* handleVerifyPrescription(action) {
 
 function* handleDispensePrescription(action) {
   try {
-    const response = yield call(
-      prescriptionAPI.dispense,
-      action.payload
-    );
+    const response = yield call(withOfflineQueue, {
+      method: 'patch',
+      endpoint: apiEndpoints.prescriptions.dispense(action.payload)
+    });
 
     yield put(updateStatusSuccess({
       id: action.payload,
       status: 'DISPENSED',
-      data: response,
+      data: response.offlineQueued ? {} : response,
     }));
   } catch (error) {
     yield put(updateStatusFailure(error.message));

@@ -74,7 +74,6 @@ const InvoicePage = () => {
 
   useEffect(() => {
     if (submitSuccess) {
-      message.success('Invoice generated successfully!');
       setIsCreateModalOpen(false);
       form.resetFields();
       resetSubmit();

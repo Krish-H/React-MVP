@@ -457,15 +457,23 @@ const DashboardLayout = ({ children }) => {
   const theme = useTheme();
 
   const menuItems = [
+    // Dashboard & Calendar: Admin (1), Provider (2)
     ...([1, 2].includes(user?.role_id) ? [{ key: '/dashboard', icon: <DashboardIcon />, label: 'Dashboard' }] : []),
-    ...([1, 2, 3].includes(user?.role_id) ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
-    ...([1, 2, 3, 4].includes(user?.role_id) ? [{ key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' }] : []),
-    ...([2, 4].includes(user?.role_id) ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }] : []),
+    // Patient Management: Provider (2), Nurse (3)
+    ...([2, 3].includes(user?.role_id) ? [{ key: '/patients', icon: <PeopleIcon />, label: 'Patients' }] : []),
+    // Appointments: Provider (2), Nurse (3), Patient (4)
+    ...([2, 3, 4].includes(user?.role_id) ? [{ key: '/appointments', icon: <CalendarTodayIcon />, label: 'Appointments' }] : []),
+    // Prescriptions: Provider (2), Patient (4), Pharmacist (5)
+    ...([2, 4, 5].includes(user?.role_id) ? [{ key: '/prescriptions', icon: <DescriptionIcon />, label: 'Prescriptions' }] : []),
+    // Pharmacy: kept for Pharmacist (5) if needed, or maybe part of prescriptions? User didn't ask to remove it, but role matrix says Pharmacist = Prescriptions. I will leave it just in case, or remove if not in matrix. Let's keep it for Pharmacist (5).
     ...([5].includes(user?.role_id) ? [{ key: '/pharmacy', icon: <LocalPharmacyIcon />, label: 'Pharmacy' }] : []),
-    ...([6].includes(user?.role_id) ? [{ key: '/calendar', icon: <CalendarMonthIcon />, label: 'Calendar' }] : []),
+    // Calendar: Admin (1), Provider (2), Nurse (3), Receptionist (6)
+    ...([1, 2, 3, 6].includes(user?.role_id) ? [{ key: '/calendar', icon: <CalendarMonthIcon />, label: 'Calendar' }] : []),
+    // Billing: Admin (1), Provider (2), Patient (4)
     ...([1, 2, 4].includes(user?.role_id) ? [{ key: '/billing', icon: <ReceiptIcon />, label: 'Billing' }] : []),
+    // Staff Management & Patient Logins: Admin (1)
     ...(user?.role_id === 1 ? [
-      { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff' },
+      { key: '/staff', icon: <SupervisorAccountIcon />, label: 'Staff Management' },
       { key: '/users', icon: <PeopleIcon />, label: 'Patient Logins' }
     ] : []),
   ];

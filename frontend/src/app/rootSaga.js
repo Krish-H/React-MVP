@@ -1,4 +1,4 @@
-import { all } from 'redux-saga/effects';
+import { all, fork } from 'redux-saga/effects';
 import authSaga from '../modules/auth/authSaga';
 import dashboardSaga from '../modules/dashboard/dashboardSaga';
 import tenantSaga from '../modules/tenant/tenantSaga';
@@ -10,6 +10,7 @@ import noteSaga from '../modules/notes/noteSaga';
 
 import calendarSaga from '../modules/calendar/calendarSaga';
 import billingSaga from '../modules/billing/billingSaga';
+import offlineSaga from '../modules/offline/offlineSaga';
 
 export default function* rootSaga() {
   yield all([
@@ -23,5 +24,6 @@ export default function* rootSaga() {
     noteSaga(),
     calendarSaga(),
     billingSaga(),
+    fork(offlineSaga),
   ]);
 }

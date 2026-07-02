@@ -1,5 +1,7 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { staffAPI } from './staffAPI';
+import { apiEndpoints } from '../../config/apiEndpoints';
+import { withOfflineQueue } from '../offline/offlineSaga';
 import {
   fetchUsersRequest,
   fetchUsersSuccess,
@@ -34,15 +36,18 @@ function* handleCreateStaff(action) {
     const { userData, staffData, onSuccess } = action.payload;
     
     // Create user/staff directly using the users API endpoint
-    yield call(staffAPI.createUser, userData);
+    const response = yield call(withOfflineQueue, {
+      method: 'post',
+      endpoint: apiEndpoints.users.base,
+      data: userData
+    });
     
     yield put(createStaffSuccess());
-    message.success('Staff member created successfully');
-    
-    // Refresh list
-    yield put(fetchUsersRequest());
-    
     if (onSuccess) onSuccess();
+    
+    if (response.offlineQueued) return;
+    
+    yield put(fetchUsersRequest());
   } catch (error) {
     yield put(createStaffFailure(error.message || 'Failed to create staff member'));
     message.error(error.message || 'Failed to create staff member');
@@ -52,16 +57,19 @@ function* handleCreateStaff(action) {
 function* handleUpdateStaff(action) {
   try {
     const { id, userData, onSuccess } = action.payload;
-    // According to the plan, we update the user details
-    yield call(staffAPI.updateUser, id, userData);
+    
+    const response = yield call(withOfflineQueue, {
+      method: 'put',
+      endpoint: `${apiEndpoints.users.base}/${id}`,
+      data: userData
+    });
     
     yield put(updateStaffSuccess());
-    message.success('Staff member updated successfully');
-    
-    // Refresh list
-    yield put(fetchUsersRequest());
-    
     if (onSuccess) onSuccess();
+    
+    if (response.offlineQueued) return;
+    
+    yield put(fetchUsersRequest());
   } catch (error) {
     yield put(updateStaffFailure(error.message || 'Failed to update staff member'));
     message.error(error.message || 'Failed to update staff member');
@@ -72,12 +80,16 @@ function* handleDeleteStaff(action) {
   try {
     // Delete user account per API specification
     const { id } = action.payload;
-    yield call(staffAPI.deleteUser, id);
+    
+    const response = yield call(withOfflineQueue, {
+      method: 'delete',
+      endpoint: `${apiEndpoints.users.base}/${id}`
+    });
     
     yield put(deleteStaffSuccess());
-    message.success('Staff member removed successfully');
     
-    // Refresh list
+    if (response.offlineQueued) return;
+    
     yield put(fetchUsersRequest());
   } catch (error) {
     yield put(deleteStaffFailure(error.message || 'Failed to delete staff member'));
@@ -89,16 +101,19 @@ function* handleToggleStaffStatus(action) {
   try {
     const { id, currentStatus } = action.payload;
     
-    if (currentStatus === 'active') {
-      yield call(staffAPI.deactivateUser, id);
-    } else {
-      yield call(staffAPI.activateUser, id);
-    }
+    const endpoint = currentStatus === 'active' 
+      ? apiEndpoints.users.deactivate(id)
+      : apiEndpoints.users.activate(id);
+      
+    const response = yield call(withOfflineQueue, {
+      method: 'patch',
+      endpoint
+    });
     
     yield put(toggleStaffStatusSuccess({ id, currentStatus }));
-    message.success(`Staff member ${currentStatus === 'active' ? 'deactivated' : 'activated'} successfully`);
     
-    // Refresh list
+    if (response.offlineQueued) return;
+    
     yield put(fetchUsersRequest());
   } catch (error) {
     yield put(toggleStaffStatusFailure(error.message || 'Failed to update status'));

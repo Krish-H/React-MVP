@@ -100,7 +100,6 @@ const AppointmentList = () => {
 
   useEffect(() => {
     if (cancelSuccess) {
-      message.success('Appointment cancelled successfully');
       resetCancel();
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps

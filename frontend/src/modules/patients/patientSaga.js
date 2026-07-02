@@ -1,5 +1,8 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { patientAPI } from './patientAPI';
+import { apiEndpoints } from '../../config/apiEndpoints';
+import { withOfflineQueue } from '../offline/offlineSaga';
+import { v4 as uuidv4 } from 'uuid';
 import {
   fetchPatientsRequest, fetchPatientsSuccess, fetchPatientsFailure,
   fetchPatientRequest,  fetchPatientSuccess,  fetchPatientFailure,
@@ -49,7 +52,17 @@ function* handleAddPatient(action) {
       medical_history:   conditions || undefined,
       emergency_contact: emergency || undefined,
     };
-    const response = yield call(patientAPI.create, payload);
+    const response = yield call(withOfflineQueue, {
+      method: 'post',
+      endpoint: apiEndpoints.patients.create,
+      data: payload
+    });
+    
+    if (response.offlineQueued) {
+      yield put(addPatientSuccess({ offlineQueued: true }));
+      return;
+    }
+    
     const listResponse = yield call(patientAPI.getAll);
     yield put(addPatientSuccess(
       listResponse.patients.find((p) => p.id === response.patient_id) || { id: response.patient_id }
@@ -72,9 +85,19 @@ function* handleUpdatePatient(action) {
       medical_history:   conditions || undefined,
       emergency_contact: emergency || undefined,
     };
-    yield call(patientAPI.update, id, payload);
-    const response = yield call(patientAPI.getById, id);
-    yield put(updatePatientSuccess(response.patient));
+    const response = yield call(withOfflineQueue, {
+      method: 'put',
+      endpoint: apiEndpoints.patients.update(id),
+      data: payload
+    });
+    
+    if (response.offlineQueued) {
+      yield put(updatePatientSuccess({ offlineQueued: true }));
+      return;
+    }
+    
+    const patientData = yield call(patientAPI.getById, id);
+    yield put(updatePatientSuccess(patientData.patient));
   } catch (error) {
     yield put(updatePatientFailure(error.message || 'Failed to update patient'));
   }
@@ -82,7 +105,10 @@ function* handleUpdatePatient(action) {
 
 function* handleDeletePatient(action) {
   try {
-    yield call(patientAPI.remove, action.payload);
+    yield call(withOfflineQueue, {
+      method: 'delete',
+      endpoint: apiEndpoints.patients.delete(action.payload)
+    });
     yield put(deletePatientSuccess(action.payload));
   } catch (error) {
     yield put(deletePatientFailure(error.message || 'Failed to delete patient'));

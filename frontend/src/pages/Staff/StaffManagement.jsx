@@ -68,7 +68,8 @@ const StaffManagement = () => {
   const [filters, setFilters] = useState({
     page: 1,
     limit: 10,
-    search: ''
+    search: '',
+    exclude_role: 4 // Exclude patient users from staff management
   });
 
   useEffect(() => {

@@ -3,6 +3,7 @@ import { encryptionService } from './encryptionService';
 
 export const apiService = {
   get: async (url, config = {}) => {
+    // We let GET requests fail naturally if offline, or sagas can handle it.
     const response = await axiosClient.get(url, config);
     return response.data;
   },

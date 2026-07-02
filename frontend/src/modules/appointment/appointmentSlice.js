@@ -55,7 +55,9 @@ const appointmentSlice = createSlice({
     createAppointmentSuccess: (state, action) => {
       state.submitting = false;
       state.submitSuccess = true;
-      state.appointments = action.payload; // full refreshed list from backend
+      if (action.payload && !action.payload.offlineQueued) {
+        state.appointments = action.payload; // full refreshed list from backend
+      }
     },
     createAppointmentFailure: (state, action) => {
       state.submitting = false;
@@ -71,11 +73,13 @@ const appointmentSlice = createSlice({
     updateAppointmentSuccess: (state, action) => {
       state.submitting = false;
       state.submitSuccess = true;
-      state.appointments = state.appointments.map((a) =>
-        a.id === action.payload.id ? action.payload : a
-      );
-      if (state.selectedAppointment?.id === action.payload.id) {
-        state.selectedAppointment = action.payload;
+      if (action.payload && !action.payload.offlineQueued) {
+        state.appointments = state.appointments.map((a) =>
+          a.id === action.payload.id ? action.payload : a
+        );
+        if (state.selectedAppointment?.id === action.payload.id) {
+          state.selectedAppointment = action.payload;
+        }
       }
     },
     updateAppointmentFailure: (state, action) => {

@@ -47,7 +47,9 @@ const noteSlice = createSlice({
     createNoteSuccess: (state, action) => {
       state.submitting = false;
       state.submitSuccess = true;
-      state.notes = [action.payload, ...state.notes];
+      if (action.payload) {
+        state.notes = [action.payload, ...state.notes];
+      }
     },
     createNoteFailure: (state, action) => {
       state.submitting = false;
@@ -66,9 +68,11 @@ const noteSlice = createSlice({
       state.submitting = false;
       state.submitSuccess = true;
 
-      state.notes = state.notes.map((n) =>
-        n.id === action.payload.id ? { ...n, ...action.payload } : n
-      );
+      if (action.payload) {
+        state.notes = state.notes.map((n) =>
+          n.id === action.payload.id ? { ...n, ...action.payload } : n
+        );
+      }
     },
     updateNoteFailure: (state, action) => {
       state.submitting = false;

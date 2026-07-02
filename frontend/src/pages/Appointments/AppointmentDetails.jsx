@@ -139,7 +139,6 @@ const AppointmentDetails = () => {
 
   useEffect(() => {
     if (submitSuccess) {
-      message.success('Appointment updated!');
       resetSubmit();
       getAppointment(id);
     }
@@ -166,10 +165,8 @@ const AppointmentDetails = () => {
     try {
       if (editingNote) {
         await updateNote(editingNote.id, { note: noteText });
-        message.success('Note updated');
       } else {
         await createNote(id, { note: noteText });
-        message.success('Note added');
       }
 
       setNoteText('');
@@ -182,7 +179,6 @@ const AppointmentDetails = () => {
   const handleDeleteNote = async (noteId) => {
     try {
       await deleteNote(noteId);
-      message.success('Note deleted');
       fetchNotes(id);
     } catch (err) {
       message.error('Delete failed');
@@ -259,12 +255,12 @@ const AppointmentDetails = () => {
           <Grid>
             <SectionTitle>Appointment Details</SectionTitle>
             <DetailItem>
-              <DetailLabel>Patient ID</DetailLabel>
-              <DetailValue>Patient #{appt.patient_id}</DetailValue>
+              <DetailLabel>Patient</DetailLabel>
+              <DetailValue>{appt.patient_name || `Patient #${appt.patient_id}`}</DetailValue>
             </DetailItem>
             <DetailItem>
-              <DetailLabel>Provider ID</DetailLabel>
-              <DetailValue>Provider #{appt.provider_id}</DetailValue>
+              <DetailLabel>Provider</DetailLabel>
+              <DetailValue>{appt.provider_name || `Provider #${appt.provider_id}`}</DetailValue>
             </DetailItem>
             <DetailItem>
               <DetailLabel>Date</DetailLabel>

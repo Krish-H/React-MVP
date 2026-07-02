@@ -126,7 +126,6 @@ const CreateAppointment = () => {
 
   useEffect(() => {
     if (submitSuccess) {
-      message.success('Appointment created successfully!');
       resetSubmit();
       navigate('/appointments');
     }

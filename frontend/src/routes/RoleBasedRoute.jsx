@@ -20,8 +20,8 @@ const ROLE_DEFAULT_ROUTE = {
   2: '/dashboard',   // doctor / provider
   3: '/patients',    // nurse (no dashboard access)
   4: '/appointments', // patient
-  5: '/dashboard',   // pharmacist
-  6: '/dashboard',   // receptionist
+  5: '/prescriptions',   // pharmacist
+  6: '/calendar',   // receptionist
 };
 
 const RoleBasedRoute = ({ allowedRoles }) => {

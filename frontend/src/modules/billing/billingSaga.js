@@ -1,5 +1,7 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { billingAPI } from './billingAPI';
+import { apiEndpoints } from '../../config/apiEndpoints';
+import { withOfflineQueue } from '../offline/offlineSaga';
 import {
   fetchInvoicesRequest,
   fetchInvoicesSuccess,
@@ -53,8 +55,15 @@ function* handleFetchSummaries() {
 
 function* handleCreateInvoice(action) {
   try {
-    yield call(billingAPI.createInvoice, action.payload);
+    const response = yield call(withOfflineQueue, {
+      method: 'post',
+      endpoint: apiEndpoints.billing.create,
+      data: action.payload
+    });
+    
     yield put(createInvoiceSuccess());
+    if (response.offlineQueued) return;
+    
     yield put(fetchInvoicesRequest());
     yield put(fetchSummariesRequest());
   } catch (error) {
@@ -65,8 +74,16 @@ function* handleCreateInvoice(action) {
 function* handleUpdateStatus(action) {
   try {
     const { id, status } = action.payload;
-    yield call(billingAPI.updateInvoiceStatus, id, { status });
+    
+    const response = yield call(withOfflineQueue, {
+      method: 'put',
+      endpoint: apiEndpoints.billing.updateStatus(id),
+      data: { status }
+    });
+    
     yield put(updateInvoiceStatusSuccess());
+    if (response.offlineQueued) return;
+    
     yield put(fetchInvoicesRequest());
     yield put(fetchSummariesRequest());
   } catch (error) {

@@ -83,7 +83,9 @@ const patientSlice = createSlice({
     addPatientSuccess: (state, action) => {
       state.submitting = false;
       state.submitSuccess = true;
-      state.list.unshift(action.payload);
+      if (!action.payload?.offlineQueued) {
+        state.list.unshift(action.payload);
+      }
     },
     addPatientFailure: (state, action) => {
       state.submitting = false;
@@ -99,9 +101,11 @@ const patientSlice = createSlice({
     updatePatientSuccess: (state, action) => {
       state.submitting = false;
       state.submitSuccess = true;
-      state.selected = action.payload;
-      const idx = state.list.findIndex((p) => p.id === action.payload.id);
-      if (idx !== -1) state.list[idx] = action.payload;
+      if (!action.payload?.offlineQueued) {
+        state.selected = action.payload;
+        const idx = state.list.findIndex((p) => p.id === action.payload.id);
+        if (idx !== -1) state.list[idx] = action.payload;
+      }
     },
     updatePatientFailure: (state, action) => {
       state.submitting = false;
