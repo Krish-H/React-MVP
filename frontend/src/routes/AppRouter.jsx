@@ -61,29 +61,29 @@ const AppRouter = () => {
             </ProtectedRoute>
           }
         >
-          {/* Dashboard is restricted from patients and nurses */}
-          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'provider', 'pharmacist', 'receptionist']} />}>
+          {/* Dashboard is available to Admin, Provider */}
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'provider', 'doctor']} />}>
             <Route path="/dashboard" element={<DashboardPage />} />
           </Route>
 
-          {/* Patients management available to Admin, Doctor, Nurse */}
-          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'nurse']} />}>
+          {/* Patients management available to Provider, Nurse */}
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'doctor', 'nurse']} />}>
             <Route path="/patients" element={<PatientList />} />
             <Route path="/patients/add" element={<AddPatient />} />
             <Route path="/patients/:id" element={<PatientDetails />} />
             <Route path="/patients/:id/edit" element={<EditPatient />} />
           </Route>
 
-          {/* Appointments available to Admin, Doctor, Nurse, Patient */}
-          <Route element={<RoleBasedRoute allowedRoles={['admin', 'doctor', 'provider', 'nurse', 'patient']} />}>
+          {/* Appointments available to Provider, Nurse, Patient */}
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'doctor', 'nurse', 'patient']} />}>
             <Route path="/appointments" element={<AppointmentList />} />
             <Route path="/appointments/create" element={<CreateAppointment />} />
             <Route path="/appointments/:id" element={<AppointmentDetails />} />
             <Route path="/appointments/:id/edit" element={<AppointmentDetails />} />
           </Route>
 
-          {/* Prescription Module */}
-          <Route element={<RoleBasedRoute allowedRoles={['provider', 'patient']} />}>
+          {/* Prescription Module - Provider, Patient, Pharmacist */}
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'doctor', 'patient', 'pharmacist']} />}>
             <Route path="/prescriptions" element={<PrescriptionList />} />
             <Route path="/prescriptions/:id" element={<PrescriptionDetails />} />
           </Route>
@@ -94,23 +94,22 @@ const AppRouter = () => {
             <Route path="/pharmacy/:id" element={<PharmacyDetails />} />
           </Route>
 
-          <Route element={<RoleBasedRoute allowedRoles={['provider']} />}>
+          <Route element={<RoleBasedRoute allowedRoles={['provider', 'doctor']} />}>
             <Route path="/prescriptions/create" element={<CreatePrescription />} />
           </Route>
 
-          {/* Calendar — Receptionist only */}
-          <Route element={<RoleBasedRoute allowedRoles={['receptionist']} />}>
+          {/* Calendar — Admin, Provider, Nurse, Receptionist */}
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'provider', 'doctor', 'nurse', 'receptionist']} />}>
             <Route path="/calendar" element={<CalendarPage />} />
           </Route>
 
           {/* Billing accessible to Admin, Provider, Patient */}
-          <Route element={<RoleBasedRoute allowedRoles={['admin', 'provider', 'patient']} />}>
+          <Route element={<RoleBasedRoute allowedRoles={['admin', 'provider', 'doctor', 'patient']} />}>
             <Route path="/billing" element={<InvoicePage />} />
           </Route>
 
           {/* Admin only routes */}
           <Route element={<RoleBasedRoute allowedRoles={['admin']} />}>
-
             <Route path="/staff" element={<StaffManagement />} />
             <Route path="/users" element={<UserManagement />} />
             <Route path="/settings/theme" element={<ThemeSettings />} />

@@ -71,7 +71,9 @@ const prescriptionSlice = createSlice({
     createPrescriptionSuccess: (state, action) => {
       state.submitting = false;
       state.submitSuccess = true;
-      state.prescriptions.unshift(action.payload);
+      if (action.payload && !action.payload.offlineQueued) {
+        state.prescriptions.unshift(action.payload);
+      }
     },
     createPrescriptionFailure: (state, action) => {
       state.submitting = false;
@@ -88,15 +90,21 @@ const prescriptionSlice = createSlice({
       state.submitting = false;
       state.submitSuccess = true;
 
-      const index = state.prescriptions.findIndex(
-        (p) => p.id === action.payload.id
-      );
+      if (action.payload && !action.payload.offlineQueued) {
+        const index = state.prescriptions.findIndex(
+          (p) => p.id === action.payload.id
+        );
 
-      if (index !== -1) {
-        state.prescriptions[index] = action.payload;
+        if (index !== -1) {
+          state.prescriptions[index] = { ...state.prescriptions[index], ...action.payload };
+        }
+
+        if (state.selectedPrescription && state.selectedPrescription.id === action.payload.id) {
+          state.selectedPrescription = { ...state.selectedPrescription, ...action.payload };
+        } else if (!state.selectedPrescription) {
+          state.selectedPrescription = action.payload;
+        }
       }
-
-      state.selectedPrescription = action.payload;
     },
     updatePrescriptionFailure: (state, action) => {
       state.submitting = false;
@@ -111,7 +119,7 @@ const prescriptionSlice = createSlice({
     addItemSuccess: (state, action) => {
       state.itemLoading = false;
 
-      if (state.selectedPrescription) {
+      if (action.payload && !action.payload.offlineQueued && state.selectedPrescription) {
         state.selectedPrescription.items.push(action.payload);
       }
     },
@@ -128,15 +136,17 @@ const prescriptionSlice = createSlice({
     updateItemSuccess: (state, action) => {
       state.itemLoading = false;
 
-      const { itemId, updatedItem } = action.payload;
+      if (action.payload && !action.payload.offlineQueued) {
+        const { itemId, updatedItem } = action.payload;
 
-      if (state.selectedPrescription) {
-        const idx = state.selectedPrescription.items.findIndex(
-          (i) => i.id === itemId
-        );
+        if (state.selectedPrescription) {
+          const idx = state.selectedPrescription.items.findIndex(
+            (i) => i.id === itemId
+          );
 
-        if (idx !== -1) {
-          state.selectedPrescription.items[idx] = updatedItem;
+          if (idx !== -1) {
+            state.selectedPrescription.items[idx] = updatedItem;
+          }
         }
       }
     },
@@ -173,16 +183,18 @@ const prescriptionSlice = createSlice({
     updateStatusSuccess: (state, action) => {
       state.statusLoading = false;
 
-      if (state.selectedPrescription) {
-        state.selectedPrescription.status = action.payload.status;
-      }
+      if (action.payload && !action.payload.offlineQueued) {
+        if (state.selectedPrescription) {
+          state.selectedPrescription.status = action.payload.status;
+        }
 
-      const index = state.prescriptions.findIndex(
-        (p) => p.id === action.payload.id
-      );
+        const index = state.prescriptions.findIndex(
+          (p) => p.id === action.payload.id
+        );
 
-      if (index !== -1) {
-        state.prescriptions[index].status = action.payload.status;
+        if (index !== -1) {
+          state.prescriptions[index].status = action.payload.status;
+        }
       }
     },
     updateStatusFailure: (state, action) => {

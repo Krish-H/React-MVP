@@ -9,6 +9,7 @@ import prescriptionReducer from '../modules/prescription/prescriptionSlice';
 import noteReducer from '../modules/notes/noteSlice';
 import calendarReducer from '../modules/calendar/calendarSlice';
 import billingReducer from '../modules/billing/billingSlice';
+import offlineReducer from '../modules/offline/offlineSlice';
 
 const rootReducer = combineReducers({
   auth: authReducer,
@@ -21,6 +22,7 @@ const rootReducer = combineReducers({
   notes: noteReducer,
   calendar: calendarReducer,
   billing: billingReducer,
+  offline: offlineReducer,
 });
 
 export default rootReducer;

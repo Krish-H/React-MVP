@@ -59,7 +59,6 @@ const EditPatient = () => {
 
   useEffect(() => {
     if (submitSuccess) {
-      message.success('Patient updated successfully!');
       resetSubmit();
       navigate(`/patients/${id}`);
     }

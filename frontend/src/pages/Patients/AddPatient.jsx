@@ -67,7 +67,6 @@ const AddPatient = () => {
 
   useEffect(() => {
     if (submitSuccess) {
-      message.success('Patient added successfully!');
       resetSubmit();
       navigate('/patients');
     }

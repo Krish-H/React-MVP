@@ -1,5 +1,7 @@
 import { call, put, takeLatest, all } from 'redux-saga/effects';
 import { appointmentAPI } from './appointmentAPI';
+import { apiEndpoints } from '../../config/apiEndpoints';
+import { withOfflineQueue } from '../offline/offlineSaga';
 import {
   fetchAppointmentsRequest, fetchAppointmentsSuccess, fetchAppointmentsFailure,
   fetchAppointmentRequest,  fetchAppointmentSuccess,  fetchAppointmentFailure,
@@ -37,7 +39,17 @@ function* handleCreateAppointment(action) {
       appointment_date: date ? date.format('YYYY-MM-DD') : '',
       appointment_time: time ? time.format('HH:mm:ss') : '',
     };
-    yield call(appointmentAPI.create, payload);
+    
+    const response = yield call(withOfflineQueue, {
+      method: 'post',
+      endpoint: apiEndpoints.appointments.create,
+      data: payload
+    });
+    
+    if (response.offlineQueued) {
+      yield put(createAppointmentSuccess());
+      return;
+    }
     // Re-fetch list to get fresh data
     const listResponse = yield call(appointmentAPI.getAll);
     yield put(createAppointmentSuccess(listResponse.appointments || []));
@@ -51,9 +63,18 @@ function* handleCreateAppointment(action) {
 function* handleUpdateAppointment(action) {
   try {
     const { id, ...data } = action.payload;
-    yield call(appointmentAPI.update, id, data);
-    const response = yield call(appointmentAPI.getById, id);
-    yield put(updateAppointmentSuccess(response.appointment));
+    const response = yield call(withOfflineQueue, {
+      method: 'put',
+      endpoint: apiEndpoints.appointments.update(id),
+      data
+    });
+    
+    if (response.offlineQueued) {
+      yield put(updateAppointmentSuccess({ offlineQueued: true }));
+      return;
+    }
+    const apptResponse = yield call(appointmentAPI.getById, id);
+    yield put(updateAppointmentSuccess(apptResponse.appointment));
   } catch (error) {
     const msg = error.response?.data?.error || error.message || 'Failed to update appointment';
     yield put(updateAppointmentFailure(msg));
@@ -62,7 +83,10 @@ function* handleUpdateAppointment(action) {
 
 function* handleCancelAppointment(action) {
   try {
-    yield call(appointmentAPI.cancel, action.payload);
+    yield call(withOfflineQueue, {
+      method: 'patch',
+      endpoint: apiEndpoints.appointments.cancel(action.payload)
+    });
     yield put(cancelAppointmentSuccess(action.payload));
   } catch (error) {
     const msg = error.response?.data?.error || error.message || 'Failed to cancel appointment';

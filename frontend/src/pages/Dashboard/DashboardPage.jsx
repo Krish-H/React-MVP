@@ -248,7 +248,7 @@ const DashboardPage = () => {
             <Grid.Row>
               {/* Left Column: Recent Appointments */}
               <Grid.Column mobile={16} tablet={16} computer={10}>
-                <AppointmentOverview appointments={recentAppointments} loading={loading} />
+                <AppointmentOverview appointments={recentAppointments} loading={loading} user={user} />
               </Grid.Column>
 
               {/* Right Column: Revenue & Activity Summaries */}

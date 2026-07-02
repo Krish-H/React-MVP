@@ -88,9 +88,11 @@ const PatientSub = styled.span`
   margin-top: 2px;
 `;
 
-const AppointmentOverview = ({ appointments = [], loading = false }) => {
+const AppointmentOverview = ({ appointments = [], loading = false, user = null }) => {
   const navigate = useNavigate();
   const theme = useTheme();
+
+  const isAdmin = user?.role_id === 1;
 
   const handleCreateClick = () => {
     navigate('/appointments');
@@ -110,20 +112,20 @@ const AppointmentOverview = ({ appointments = [], loading = false }) => {
     },
     {
       title: 'Doctor',
-      dataIndex: 'doctor_name',
-      key: 'doctor_name',
-      render: (text) => <span style={{ color: theme?.colors?.neutral?.textPrimary || '#0A192F', fontWeight: 500 }}>{text || 'Dr. Self'}</span>
+      dataIndex: 'provider_name',
+      key: 'provider_name',
+      render: (text, record) => <span style={{ color: theme?.colors?.neutral?.textPrimary || '#0A192F', fontWeight: 500 }}>{text || `Provider #${record.provider_id}`}</span>
     },
     {
       title: 'Date',
-      dataIndex: 'date',
-      key: 'date',
+      dataIndex: 'appointment_date',
+      key: 'appointment_date',
       render: (text) => <span style={{ color: theme?.colors?.neutral?.textSecondary || '#64748B' }}>{text}</span>
     },
     {
       title: 'Time',
-      dataIndex: 'time',
-      key: 'time',
+      dataIndex: 'appointment_time',
+      key: 'appointment_time',
       render: (text) => <span style={{ color: theme?.colors?.neutral?.textSecondary || '#64748B' }}>{text}</span>
     },
     {
@@ -143,9 +145,11 @@ const AppointmentOverview = ({ appointments = [], loading = false }) => {
       <TableContainer 
         title="Recent Appointments" 
         extra={
-          <Button variant="primary" size="small" onClick={handleCreateClick}>
-            <AddIcon style={{ fontSize: 16, marginRight: 4, verticalAlign: 'middle' }} /> Create Appointment
-          </Button>
+          !isAdmin && (
+            <Button variant="primary" size="small" onClick={handleCreateClick}>
+              <AddIcon style={{ fontSize: 16, marginRight: 4, verticalAlign: 'middle' }} /> Create Appointment
+            </Button>
+          )
         }
       >
         <div style={{ padding: '40px 24px' }}>
@@ -163,9 +167,11 @@ const AppointmentOverview = ({ appointments = [], loading = false }) => {
     <TableContainer 
       title="Recent Appointments" 
       extra={
-        <Button variant="primary" size="small" onClick={handleCreateClick}>
-          <AddIcon style={{ fontSize: 16, marginRight: 4, verticalAlign: 'middle' }} /> Create Appointment
-        </Button>
+        !isAdmin && (
+          <Button variant="primary" size="small" onClick={handleCreateClick}>
+            <AddIcon style={{ fontSize: 16, marginRight: 4, verticalAlign: 'middle' }} /> Create Appointment
+          </Button>
+        )
       }
     >
       <Table 
