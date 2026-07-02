@@ -66,7 +66,7 @@ const CancelBtn = styled(Button)`
   font-weight: 600;
 `;
 
-const PatientForm = ({ 
+const PatientForm = React.memo(({ 
   initialValues = {}, 
   onSubmit, 
   submitLabel = 'Save Patient', 
@@ -203,6 +203,6 @@ const PatientForm = ({
       </ButtonRow>
     </Form>
   );
-};
+});
 
 export default PatientForm;

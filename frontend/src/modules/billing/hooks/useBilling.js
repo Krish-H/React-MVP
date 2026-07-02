@@ -1,5 +1,6 @@
 import { useDispatch, useSelector } from 'react-redux';
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
+import { selectBillingState } from '../selectors';
 import {
   fetchInvoicesRequest,
   fetchMyInvoicesRequest,
@@ -24,7 +25,7 @@ export const useBilling = () => {
     submitting,
     submitSuccess,
     submitError,
-  } = useSelector((state) => state.billing);
+  } = useSelector(selectBillingState);
 
   const fetchInvoices = useCallback(() => {
     dispatch(fetchInvoicesRequest());
@@ -50,7 +51,7 @@ export const useBilling = () => {
     dispatch(resetSubmitState());
   }, [dispatch]);
 
-  return {
+  return useMemo(() => ({
     invoices,
     myInvoices,
     pendingSummary,
@@ -68,5 +69,24 @@ export const useBilling = () => {
     createInvoice,
     updateStatus,
     resetSubmit
-  };
+  }), [
+    invoices,
+    myInvoices,
+    pendingSummary,
+    paidSummary,
+    listLoading,
+    listError,
+    summaryLoading,
+    summaryError,
+    submitting,
+    submitSuccess,
+    submitError,
+    fetchInvoices,
+    fetchMyInvoices,
+    fetchSummaries,
+    createInvoice,
+    updateStatus,
+    resetSubmit
+  ]);
 };
+

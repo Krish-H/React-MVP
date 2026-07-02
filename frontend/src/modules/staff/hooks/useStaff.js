@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useMemo } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import {
   fetchUsersRequest,
@@ -8,6 +8,7 @@ import {
   toggleStaffStatusRequest,
   clearStaffErrors
 } from '../staffSlice';
+import { selectStaffState } from '../selectors';
 
 export const useStaff = () => {
   const dispatch = useDispatch();
@@ -18,7 +19,7 @@ export const useStaff = () => {
     error, 
     actionLoading, 
     actionError 
-  } = useSelector((state) => state.staff);
+  } = useSelector(selectStaffState);
 
   const fetchUsers = useCallback((params) => {
     dispatch(fetchUsersRequest(params));
@@ -44,7 +45,7 @@ export const useStaff = () => {
     dispatch(clearStaffErrors());
   }, [dispatch]);
 
-  return {
+  return useMemo(() => ({
     users,
     pagination,
     loading,
@@ -57,5 +58,18 @@ export const useStaff = () => {
     deleteStaff,
     toggleStatus,
     clearErrors
-  };
+  }), [
+    users,
+    pagination,
+    loading,
+    error,
+    actionLoading,
+    actionError,
+    fetchUsers,
+    createStaff,
+    updateStaff,
+    deleteStaff,
+    toggleStatus,
+    clearErrors
+  ]);
 };
