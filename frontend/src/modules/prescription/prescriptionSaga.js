@@ -221,7 +221,7 @@ function* handleUpdateStatus(action) {
 function* handleVerifyPrescription(action) {
   try {
     const response = yield call(withOfflineQueue, {
-      method: 'patch',
+      method: 'post',
       endpoint: apiEndpoints.prescriptions.verify(action.payload)
     });
 
@@ -238,7 +238,7 @@ function* handleVerifyPrescription(action) {
 function* handleDispensePrescription(action) {
   try {
     const response = yield call(withOfflineQueue, {
-      method: 'patch',
+      method: 'post',
       endpoint: apiEndpoints.prescriptions.dispense(action.payload)
     });
 
